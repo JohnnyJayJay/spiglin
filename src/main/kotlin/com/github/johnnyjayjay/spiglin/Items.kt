@@ -11,6 +11,8 @@ import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
 
+const val STACK = 64
+
 inline fun item(body: ItemStackBuilder.() -> Unit) =
     ItemStackBuilder().apply(body).build()
 
@@ -52,10 +54,6 @@ class ItemStackBuilder {
         } else {
             addEnchantment(enchantment, level)
         }
-    }
-
-    companion object {
-        const val STACK = 64
     }
 }
 
