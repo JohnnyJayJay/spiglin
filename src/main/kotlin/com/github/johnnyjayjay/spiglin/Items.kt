@@ -120,7 +120,7 @@ class Attributes internal constructor() {
     internal val modifiers: Multimap<Attribute, AttributeModifier> =
         Multimaps.newListMultimap(emptyMap()) { mutableListOf() }
 
-    infix fun modify(attribute: Attribute) = ModifierNode(attribute)
+    fun modify(attribute: Attribute) = ModifierNode(attribute)
 
     inner class ModifierNode internal constructor(private val attribute: Attribute) {
 
@@ -131,7 +131,5 @@ class Attributes internal constructor() {
         infix fun with(modifiers: Iterable<AttributeModifier>) {
             this@Attributes.modifiers.putAll(attribute, modifiers)
         }
-
-        fun allOf(vararg modifiers: AttributeModifier) = modifiers.toList()
     }
 }
