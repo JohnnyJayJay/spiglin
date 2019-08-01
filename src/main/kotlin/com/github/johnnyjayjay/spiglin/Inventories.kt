@@ -36,12 +36,10 @@ class InventoryBuilder {
 
     fun build(plugin: Plugin? = null): Inventory {
         val inventory = Bukkit.createInventory(holder, size, title)
-
-
+        inventory.contents = items.toContents()
         if (plugin != null) {
             ClickListener.inventories[inventory] = items.toMap()
         }
-
         return inventory
     }
 
