@@ -11,17 +11,11 @@ import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
 
-inline fun item(body: ItemStackBuilder.() -> Unit): ItemStack {
-    val builder = ItemStackBuilder()
-    builder.body()
-    return builder.build()
-}
+inline fun item(body: ItemStackBuilder.() -> Unit) =
+    ItemStackBuilder().apply(body).build()
 
-inline fun itemMeta(material: Material, body: ItemMetaBuilder.() -> Unit): ItemMeta? {
-    val builder = ItemMetaBuilder()
-    builder.body()
-    return builder.build(material)
-}
+inline fun itemMeta(material: Material, body: ItemMetaBuilder.() -> Unit) =
+    ItemMetaBuilder().apply(body).build(material)
 
 class ItemStackBuilder {
 
