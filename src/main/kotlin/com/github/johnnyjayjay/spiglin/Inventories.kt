@@ -38,7 +38,7 @@ class InventoryBuilder {
         val inventory = Bukkit.createInventory(holder, size, title)
         inventory.contents = items.toContents()
         if (plugin != null) {
-            ClickListener.inventories[inventory] = items.toMap()
+            ClickListener.inventories[inventory] = items.clickables
         }
         return inventory
     }
@@ -50,11 +50,13 @@ class InventoryBuilder {
 
 object ClickListener : Listener {
 
-    internal val inventories: MutableMap<Inventory, Map<ItemStack?, (InventoryClickEvent) -> Unit>> = mutableMapOf()
+    internal val inventories: MutableMap<Inventory, Set<ClickableItem>> = mutableMapOf()
 
     @EventHandler
     fun onClick(event: InventoryClickEvent) {
-        inventories[event.inventory]?.get(event.currentItem)?.invoke(event)
+        inventories[event.inventory]?.firstOrNull {
+            it == event.currentItem
+        }?.action(event)
     }
 
     @EventHandler
@@ -68,21 +70,32 @@ object ClickListener : Listener {
 
 class Items internal constructor(rows: Int) {
 
-    val grid: Array<Array<Item?>> = Array(rows) { arrayOfNulls(ROW_SIZE) }
+    val grid: Array<Array<ItemStack?>> = Array(rows) { arrayOfNulls(ROW_SIZE) }
 
-    operator fun Array<Item>.set(index: Int, itemStack: ItemStack) {
-        this[index] = wrap(itemStack)
+    internal val clickables: Set<ClickableItem>
+        get() {
+            return grid
+                .asSequence()
+                .reduce { one, two ->
+                    val array = arrayOfNulls<ItemStack?>(one.size + two.size)
+                    for (i in one.indices)
+                        array[i] = one[i] as? ClickableItem
+                    for (i in two.indices)
+                        array[i] = two[i] as? ClickableItem
+                    array
+                }
+                .filterNotNull()
+                .map { it as ClickableItem }
+                .toSet()
+        }
+
+    infix fun ItemStack.withAction(action: (InventoryClickEvent) -> Unit): ItemStack {
+        return ClickableItem(this, action)
     }
 
-    infix fun ItemStack.onClick(action: (InventoryClickEvent) -> Unit): Item {
-        return Item(this, action)
-    }
-
-    fun wrap(stack: ItemStack? = null, action: ((InventoryClickEvent) -> Unit)? = null) = Item(stack, action)
-
-    fun fillWith(item: Item, vararg except: Pair<Int, Int> = emptyArray()) {
+    fun fillWith(item: ItemStack, vararg except: Pair<Int, Int> = emptyArray()) {
         grid.forEachIndexed { x, row ->
-            row.forEachIndexed { y, item ->
+            row.forEachIndexed { y, _ ->
                 if (x to y !in except) {
                     grid[x][y] = item
                 }
@@ -90,35 +103,17 @@ class Items internal constructor(rows: Int) {
         }
     }
 
-    fun toMap(): Map<ItemStack?, (InventoryClickEvent) -> Unit> {
-        return grid
-            .asSequence()
-            .reduce { one, two ->
-                val array = arrayOfNulls<Items.Item?>(one.size + two.size)
-                for (i in one.indices)
-                    array[i] = one[i]
-                for (i in two.indices)
-                    array[i] = two[i]
-                array
-            }
-            .filterNotNull()
-            .filter { it.action != null }
-            .fold(mutableMapOf()) { map, item ->
-                map[item.stack] = item.action!!
-                map
-            }
-    }
-
     fun toContents(): Array<ItemStack?> {
         val contents = Array<ItemStack?>(grid.size * ROW_SIZE) {}
         for (row in grid) {
             for (item in row) {
                 val index = grid.indexOf(row) * ROW_SIZE + row.indexOf(item)
-                contents[index] = item?.stack
+                contents[index] = item
             }
         }
         return contents
     }
 
-    data class Item(val stack: ItemStack?, val action: ((InventoryClickEvent) -> Unit)?)
 }
+
+internal data class ClickableItem(val stack: ItemStack, val action: (InventoryClickEvent) -> Unit) : ItemStack(stack)
