@@ -69,9 +69,8 @@ class EnchantmentNode internal constructor(val unsafe: Boolean) {
         return this
     }
 
-    infix fun level(level: Int): EnchantmentNode {
+    infix fun level(level: Int) {
         this.level = level
-        return this
     }
 
 }
