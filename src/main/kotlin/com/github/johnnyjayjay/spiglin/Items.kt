@@ -45,8 +45,8 @@ class ItemStackBuilder {
         enchantments!!.addAll(EnchantmentNode().apply(body).set)
     }
 
-    fun meta(body: ItemMetaBuilder.() -> Unit) {
-        meta = ItemMetaBuilder(type).apply(body).build()
+    fun meta(body: ItemMeta.() -> Unit) {
+        meta = itemMeta(material = type, body = body)
     }
 
     fun build(): ItemStack {
@@ -114,48 +114,6 @@ fun ItemMeta.enchantments(body: EnchantmentNode.() -> Unit) {
     EnchantmentNode().apply(body).set.forEach {
         addEnchant(it.enchantment, it.level, it.flag)
     }
-}
-
-
-class ItemMetaBuilder(val material: Material) {
-
-    var unbreakable: Boolean = false
-    var lore: String? = null
-    var displayName: String? = null
-    var localizedName: String? = null
-    var customModelData: Int? = null
-    var flags: MutableList<ItemFlag>? = null
-        get() {
-            if (field == null) {
-                field = mutableListOf()
-            }
-            return field
-        }
-
-    private var attributes: Attributes? = null
-        get() {
-            if (field == null) {
-                field = Attributes()
-            }
-            return field
-        }
-
-    fun build(): ItemMeta? {
-        val meta = Bukkit.getItemFactory().getItemMeta(material) ?: return null
-        meta.isUnbreakable = unbreakable
-        meta.lore = lore?.split(LORE_SPLIT_REGEX)?.toList()
-        meta.setDisplayName(displayName)
-        meta.setLocalizedName(localizedName)
-        meta.setCustomModelData(customModelData)
-
-        flags?.forEach { meta.addItemFlags(it) }
-        return meta
-    }
-
-    fun attributes(body: Attributes.() -> Unit) {
-        attributes!!.body()
-    }
-
 }
 
 class Attributes internal constructor() {
