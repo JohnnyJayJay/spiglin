@@ -2,19 +2,20 @@ package com.github.johnnyjayjay.spiglin
 
 import org.bukkit.plugin.Plugin
 import org.bukkit.scheduler.BukkitRunnable
+import org.bukkit.scheduler.BukkitTask
 
-fun run(plugin: Plugin, async: Boolean = false, task: BukkitRunnable.() -> Unit) {
+fun run(plugin: Plugin, async: Boolean = false, task: BukkitRunnable.() -> Unit): BukkitTask {
     val runnable = DelegatingRunnable(task)
-    if (async) {
+    return if (async) {
         runnable.runTaskAsynchronously(plugin)
     } else {
         runnable.runTask(plugin)
     }
 }
 
-fun delay(ticks: Long, async: Boolean = false, plugin: Plugin, task: BukkitRunnable.() -> Unit) {
+fun delay(ticks: Long, async: Boolean = false, plugin: Plugin, task: BukkitRunnable.() -> Unit): BukkitTask {
     val runnable = DelegatingRunnable(task)
-    if (async) {
+    return if (async) {
         runnable.runTaskLaterAsynchronously(plugin, ticks)
     } else {
         runnable.runTaskLater(plugin, ticks)
@@ -27,9 +28,9 @@ fun schedule(
     delay: Long = 0,
     period: Long = 20,
     task: BukkitRunnable.() -> Unit
-) {
+): BukkitTask {
     val runnable = DelegatingRunnable(task)
-    if (async) {
+    return if (async) {
         runnable.runTaskTimerAsynchronously(plugin, delay, period)
     } else {
         runnable.runTaskTimer(plugin, delay, period)
@@ -43,7 +44,7 @@ inline fun repeat(
     period: Long = 20,
     times: Int = -1,
     crossinline task: BukkitRunnable.(Int) -> Unit
-) {
+): BukkitTask {
     val runnable = object : BukkitRunnable() {
         private var timesRun = 0
 
@@ -56,7 +57,7 @@ inline fun repeat(
         }
     }
 
-    if (async) {
+    return if (async) {
         runnable.runTaskTimerAsynchronously(plugin, delay, period)
     } else {
         runnable.runTaskTimer(plugin, delay, period)
@@ -70,8 +71,8 @@ inline fun countdown(
     period: Long = 20,
     from: Int,
     crossinline task: BukkitRunnable.(Int) -> Unit
-) {
-    repeat(plugin, async, delay, period, from) {
+): BukkitTask {
+    return repeat(plugin, async, delay, period, from) {
         task(from - it)
     }
 }
