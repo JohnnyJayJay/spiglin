@@ -2,6 +2,7 @@ package com.github.johnnyjayjay.spiglin
 
 import com.google.common.collect.Multimap
 import com.google.common.collect.Multimaps
+import org.apache.commons.lang.Validate
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.attribute.Attribute
@@ -11,45 +12,52 @@ import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
 
+val LORE_SPLIT_REGEX = "\n".toRegex()
+
 const val STACK = 64
 
 inline fun item(body: ItemStackBuilder.() -> Unit) =
     ItemStackBuilder().apply(body).build()
 
-inline fun itemMeta(material: Material, body: ItemMetaBuilder.() -> Unit) =
-    ItemMetaBuilder().apply(body).build(material)
+inline fun <reified T : ItemMeta> itemMeta(material: Material, body: T.() -> Unit): T {
+    val meta = Bukkit.getItemFactory().getItemMeta(material)
+    Validate.isTrue(meta is T, "ItemMeta for provided material does not match actual type parameter")
+    meta as T
+    meta.body()
+    return meta
+}
 
 class ItemStackBuilder {
 
     lateinit var type: Material
     var amount: Int = 1
+    var meta: ItemMeta? = null
 
-    private var enchantments: MutableList<EnchantmentNode>? = null
-    private var metaBuilder: ItemMetaBuilder? = null
+    private var enchantments: MutableSet<EnchantmentContainer>? = null
+        get() {
+            if (field == null) {
+                field = mutableSetOf()
+            }
+            return field
+        }
 
-    fun enchant(unsafe: Boolean = false): EnchantmentNode {
-        if (enchantments == null)
-            enchantments = mutableListOf()
-        val node = EnchantmentNode(unsafe)
-        enchantments!!.add(node)
-        return node
+    fun enchantments(body: EnchantmentNode.() -> Unit) {
+        enchantments!!.addAll(EnchantmentNode().apply(body).set)
     }
 
     fun meta(body: ItemMetaBuilder.() -> Unit) {
-        if (metaBuilder == null)
-            metaBuilder = ItemMetaBuilder()
-        metaBuilder!!.body()
+        meta = ItemMetaBuilder(type).apply(body).build()
     }
 
     fun build(): ItemStack {
         val itemStack = ItemStack(type, amount)
         enchantments?.forEach { itemStack.addEnchantment(it) }
-        itemStack.itemMeta = metaBuilder?.build(type)
+        itemStack.itemMeta = meta
         return itemStack
     }
 
-    private fun ItemStack.addEnchantment(node: EnchantmentNode) = with (node) {
-        if (unsafe) {
+    private fun ItemStack.addEnchantment(container: EnchantmentContainer) = with (container) {
+        if (flag) {
             addUnsafeEnchantment(enchantment, level)
         } else {
             addEnchantment(enchantment, level)
@@ -57,12 +65,18 @@ class ItemStackBuilder {
     }
 }
 
-class EnchantmentNode internal constructor(val unsafe: Boolean) {
+class EnchantmentNode {
 
+    internal val set: MutableSet<EnchantmentContainer> = mutableSetOf()
+
+    fun enchant(flag: Boolean = false) = EnchantmentContainer(flag)
+}
+
+data class EnchantmentContainer(val flag: Boolean) {
     lateinit var enchantment: Enchantment
     var level: Int = 1
 
-    infix fun with(enchantment: Enchantment): EnchantmentNode {
+    infix fun with(enchantment: Enchantment): EnchantmentContainer {
         this.enchantment = enchantment
         return this
     }
@@ -70,40 +84,78 @@ class EnchantmentNode internal constructor(val unsafe: Boolean) {
     infix fun level(level: Int) {
         this.level = level
     }
-
 }
 
-class ItemMetaBuilder {
+var ItemMeta.lore: String?
+    get() = lore?.joinToString("\n")
+    set(value) {
+        lore = value?.split(LORE_SPLIT_REGEX)
+    }
+
+var ItemMeta.displayName: String?
+    get() = displayName
+    set(value) {
+        setDisplayName(value)
+    }
+
+var ItemMeta.customModelData: Int?
+    get() = customModelData
+    set(value) {
+        setCustomModelData(value)
+    }
+
+fun ItemMeta.attributes(body: Attributes.() -> Unit) {
+    if (attributeModifiers == null)
+        attributeModifiers = Multimaps.newListMultimap(mutableMapOf()) { mutableListOf() }
+    attributeModifiers!!.putAll(Attributes().apply(body).modifiers)
+}
+
+fun ItemMeta.enchantments(body: EnchantmentNode.() -> Unit) {
+    EnchantmentNode().apply(body).set.forEach {
+        addEnchant(it.enchantment, it.level, it.flag)
+    }
+}
+
+
+class ItemMetaBuilder(val material: Material) {
 
     var unbreakable: Boolean = false
     var lore: String? = null
     var displayName: String? = null
     var localizedName: String? = null
     var customModelData: Int? = null
-    var flags: Iterable<ItemFlag> = emptyList()
+    var flags: MutableList<ItemFlag>? = null
+        get() {
+            if (field == null) {
+                field = mutableListOf()
+            }
+            return field
+        }
 
     private var attributes: Attributes? = null
+        get() {
+            if (field == null) {
+                field = Attributes()
+            }
+            return field
+        }
 
-    fun build(material: Material): ItemMeta? {
+    fun build(): ItemMeta? {
         val meta = Bukkit.getItemFactory().getItemMeta(material) ?: return null
         meta.isUnbreakable = unbreakable
-        meta.lore = lore?.split(splitRegex)?.toList()
+        meta.lore = lore?.split(LORE_SPLIT_REGEX)?.toList()
         meta.setDisplayName(displayName)
         meta.setLocalizedName(localizedName)
         meta.setCustomModelData(customModelData)
-        flags.forEach { meta.addItemFlags(it) }
+
+        flags?.forEach { meta.addItemFlags(it) }
         return meta
     }
 
     fun attributes(body: Attributes.() -> Unit) {
-        if (attributes == null)
-            attributes = Attributes()
         attributes!!.body()
     }
 
-    companion object {
-        private val splitRegex = "\n".toRegex()
-    }
 }
 
 class Attributes internal constructor() {

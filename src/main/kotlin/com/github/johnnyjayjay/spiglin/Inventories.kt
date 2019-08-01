@@ -14,6 +14,8 @@ import org.bukkit.plugin.Plugin
 
 const val ROW_SIZE = 9
 
+inline fun inventoryItems(rows: Int = 3, body: Items.() -> Unit) = Items(rows).apply(body)
+
 inline fun inventory(plugin: Plugin? = null, body: InventoryBuilder.() -> Unit) =
     InventoryBuilder().apply(body).build(plugin)
 
@@ -21,22 +23,21 @@ class InventoryBuilder {
 
     var title: String = InventoryType.CHEST.defaultTitle
     var holder: InventoryHolder? = null
-    var size: Int = DEFAULT_ROWS * ROW_SIZE
+    var rows: Int = DEFAULT_ROWS
         set(value) {
-            Validate.isTrue(value % ROW_SIZE == 0, "Size must be a multiple of InventoryBuilder.ROW_SIZE")
+            items = Items(rows)
             field = value
-            items = Items(value % ROW_SIZE)
         }
 
-    private var items: Items = Items(size % ROW_SIZE)
+    private var items: Items = Items(rows % ROW_SIZE)
 
     fun items(body: Items.() -> Unit) {
         items.body()
     }
 
     fun build(plugin: Plugin? = null): Inventory {
-        val inventory = Bukkit.createInventory(holder, size, title)
-        inventory.contents = items.toContents()
+        val inventory = Bukkit.createInventory(holder, rows, title)
+        inventory.setItems(items)
         if (plugin != null) {
             ClickListener.inventories[inventory] = items.clickables
         }
@@ -68,7 +69,7 @@ object ClickListener : Listener {
 
 }
 
-class Items internal constructor(rows: Int) {
+class Items(rows: Int) {
 
     val grid: Array<Array<ItemStack?>> = Array(rows) { arrayOfNulls(ROW_SIZE) }
 
@@ -93,10 +94,10 @@ class Items internal constructor(rows: Int) {
         return ClickableItem(this, action)
     }
 
-    fun fillWith(item: ItemStack, vararg except: Pair<Int, Int> = emptyArray()) {
+    fun fillWith(item: ItemStack, vararg except: Slot = emptyArray()) {
         grid.forEachIndexed { x, row ->
             row.forEachIndexed { y, _ ->
-                if (x to y !in except) {
+                if (Slot(x, y) !in except) {
                     grid[x][y] = item
                 }
             }
@@ -114,6 +115,29 @@ class Items internal constructor(rows: Int) {
         return contents
     }
 
+}
+
+fun Inventory.setItems(items: Items) {
+    contents = items.toContents()
+}
+
+operator fun Inventory.get(slot: Slot): ItemStack? = contents[slot.oneDimensional]
+
+operator fun Inventory.set(slot: Slot, stack: ItemStack?) {
+    contents[slot.oneDimensional] = stack
+}
+
+data class Slot(val row: Int, val column: Int) {
+    val oneDimensional = row * ROW_SIZE + column
+
+    init {
+        Validate.isTrue(column in 0 until ROW_SIZE, "Column out of bounds")
+        Validate.isTrue(row >= 0, "Row out of bounds")
+    }
+
+    companion object {
+        val FIRST = Slot(0, 0)
+    }
 }
 
 internal data class ClickableItem(val stack: ItemStack, val action: (InventoryClickEvent) -> Unit) : ItemStack(stack)
