@@ -80,8 +80,14 @@ class Items internal constructor(rows: Int) {
 
     fun wrap(stack: ItemStack? = null, action: ((InventoryClickEvent) -> Unit)? = null) = Item(stack, action)
 
-    fun fillWith(item: Item) {
-        grid.forEach { it.fill(item) }
+    fun fillWith(item: Item, vararg except: Pair<Int, Int> = emptyArray()) {
+        grid.forEachIndexed { x, row ->
+            row.forEachIndexed { y, item ->
+                if (x to y !in except) {
+                    grid[x][y] = item
+                }
+            }
+        }
     }
 
     fun toMap(): Map<ItemStack?, (InventoryClickEvent) -> Unit> {
