@@ -127,6 +127,8 @@ operator fun Inventory.set(slot: Slot, stack: ItemStack?) {
     contents[slot.oneDimensional] = stack
 }
 
+infix fun Int.rc(other: Int) = Slot(this, other)
+
 data class Slot(val row: Int, val column: Int) {
     val oneDimensional = row * ROW_SIZE + column
 
