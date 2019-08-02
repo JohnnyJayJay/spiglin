@@ -71,11 +71,7 @@ inline fun countdown(
     period: Long = 20,
     from: Int,
     crossinline task: BukkitRunnable.(Int) -> Unit
-): BukkitTask {
-    return repeat(plugin, async, delay, period, from) {
-        task(from - it)
-    }
-}
+) =  repeat(plugin, async, delay, period, from) { task(from - it) }
 
 internal class DelegatingRunnable(private val task: BukkitRunnable.() -> Unit) : BukkitRunnable() {
     override fun run() = task()
