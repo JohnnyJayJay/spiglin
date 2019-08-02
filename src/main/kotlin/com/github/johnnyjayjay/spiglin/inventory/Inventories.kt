@@ -1,11 +1,8 @@
-package com.github.johnnyjayjay.spiglin
+package com.github.johnnyjayjay.spiglin.inventory
 
+import com.github.johnnyjayjay.spiglin.NEW_LINE_SPLIT
 import org.apache.commons.lang.Validate
 import org.bukkit.Bukkit
-import org.bukkit.event.EventHandler
-import org.bukkit.event.Listener
-import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.event.inventory.InventoryType
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.InventoryHolder
@@ -14,7 +11,8 @@ import org.bukkit.plugin.Plugin
 
 const val ROW_SIZE = 9
 
-inline fun inventoryItems(rows: Int = 3, body: Items.() -> Unit) = Items(rows).apply(body)
+inline fun inventoryItems(rows: Int = 3, body: Items.() -> Unit) =
+    Items(rows).apply(body)
 
 inline fun inventory(plugin: Plugin? = null, body: InventoryBuilder.() -> Unit) =
     InventoryBuilder().apply(body).build(plugin)
@@ -32,7 +30,7 @@ class InventoryBuilder {
 
     fun build(plugin: Plugin? = null): Inventory {
         val inventory = Bukkit.createInventory(holder, rows, title)
-        inventory.setItems(items)
+        inventory.items = items
         if (plugin != null) {
             ClickListener.inventories[inventory] = items.clickables
         }
@@ -44,25 +42,6 @@ class InventoryBuilder {
     }
 }
 
-object ClickListener : Listener {
-
-    internal val inventories: MutableMap<Inventory, Set<ClickableItem>> = mutableMapOf()
-
-    @EventHandler
-    fun onClick(event: InventoryClickEvent) {
-        inventories[event.inventory]?.firstOrNull {
-            it == event.currentItem
-        }?.action(event)
-    }
-
-    @EventHandler
-    fun onClose(event: InventoryCloseEvent) {
-        if (event.inventory in inventories) {
-            inventories.remove(event.inventory)
-        }
-    }
-
-}
 
 class Items(rows: Int) {
 
@@ -76,27 +55,28 @@ class Items(rows: Int) {
                 .toSet()
         }
 
-    infix fun ItemStack.withAction(action: (InventoryClickEvent) -> Unit): ItemStack {
-        return ClickableItem(this, action)
+    operator fun Array<Array<ItemStack?>>.get(row: Int, column: Int) = grid[row][column]
+
+    operator fun Array<Array<ItemStack?>>.set(row: Int, column: Int, item: ItemStack?) {
+        grid[row][column] = item
     }
 
-    fun fillWith(item: ItemStack, vararg except: Slot = emptyArray()) {
+    fun fillWith(item: ItemStack, vararg except: Pair<Int, Int> = emptyArray()) {
         grid.forEachIndexed { x, row ->
             row.forEachIndexed { y, _ ->
-                if (Slot(x, y) !in except) {
+                if (x to y !in except) {
                     grid[x][y] = item
                 }
             }
         }
     }
 
-
-
     fun toContents(): Array<ItemStack?> {
         val contents = Array<ItemStack?>(grid.size * ROW_SIZE) {}
         for (row in grid) {
             for (item in row) {
-                val index = grid.indexOf(row) * ROW_SIZE + row.indexOf(item)
+                val index =
+                    linearInventoryIndex(grid.indexOf(row), row.indexOf(item))
                 contents[index] = item
             }
         }
@@ -132,27 +112,3 @@ class Items(rows: Int) {
         }
     }
 }
-
-var Inventory.items: Items
-    get() = Items.from(contents)
-    set(value) { contents = value.toContents() }
-
-operator fun Inventory.get(slot: Slot): ItemStack? = contents[slot.oneDimensional]
-
-operator fun Inventory.set(slot: Slot, stack: ItemStack?) {
-    contents[slot.oneDimensional] = stack
-}
-
-infix fun Int.rc(other: Int) = Slot(this, other)
-
-data class Slot(val row: Int, val column: Int) {
-    val oneDimensional = row * ROW_SIZE + column
-
-    init {
-        Validate.isTrue(column in 0 until ROW_SIZE, "Column out of bounds")
-        Validate.isTrue(row >= 0, "Row out of bounds")
-    }
-
-}
-
-internal data class ClickableItem(val stack: ItemStack, val action: (InventoryClickEvent) -> Unit) : ItemStack(stack)
