@@ -42,6 +42,10 @@ class ItemStackBuilder {
             return field
         }
 
+    inline fun <reified T : ItemMeta> meta(body: T.() -> Unit) {
+        meta = itemMeta(type, body)
+    }
+
     fun enchantments(body: EnchantmentNode.() -> Unit) {
         enchantments!!.addAll(EnchantmentNode().apply(body).set)
     }
@@ -72,7 +76,7 @@ class EnchantmentNode {
     fun enchant(unrestricted: Boolean = false) = EnchantmentContainer(unrestricted)
 }
 
-data class EnchantmentContainer(val unrestricted: Boolean) {
+data class EnchantmentContainer internal constructor(val unrestricted: Boolean) {
     lateinit var enchantment: Enchantment
     var level: Int = 1
 

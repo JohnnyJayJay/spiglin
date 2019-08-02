@@ -16,9 +16,9 @@ val item: ItemStack = item {
     enchantments {
         enchant(unrestricted = true) with Enchantment.FIRE_ASPECT level 3 // adds fire aspect 3 as an enchantment
     }
-    meta { // opens the ItemMeta scope in which properties of ItemMeta can be configured
+    meta { // meta {} also has a type parameter that lets you work with more specific ItemMetas.
         displayName = "Grass block of doom"
-        lore = "A very\npowerful weapon" // instead of Lists, normal Strings with new lines are used for lore
+        stringLore = "A very\npowerful weapon" // instead of Lists, normal Strings can be used with stringLore. This just delegates to the normal lore.
         unbreakable = true
         flag(ItemFlag.HIDE_UNBREAKABLE)
         attributes {
@@ -27,5 +27,12 @@ val item: ItemStack = item {
     }   
 }
 ```
+Note that some things (like `attributes`) are exclusive to certain Spigot versions. Just remember that this EDSL 
+is just a wrapper of what is possible anyway. If a certain feature does not exist in your version but does in Spiglin, 
+I highly discourage you from using it. You will most likely get runtime errors.
 
+If you are uncertain, check out the documentation for the individual methods and variables.
+
+### Inventory EDSL
+This EDSL works similar to the ItemStack EDSL and is fully compatible with it.
 
