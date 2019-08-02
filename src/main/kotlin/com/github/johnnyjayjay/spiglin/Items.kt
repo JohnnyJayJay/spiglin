@@ -8,6 +8,7 @@ import org.bukkit.Material
 import org.bukkit.attribute.Attribute
 import org.bukkit.attribute.AttributeModifier
 import org.bukkit.enchantments.Enchantment
+import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
 
@@ -98,6 +99,10 @@ var ItemMeta.customModelData: Int?
     set(value) {
         setCustomModelData(value)
     }
+
+fun ItemMeta.flags(vararg flags: ItemFlag) = addItemFlags(*flags)
+
+fun ItemMeta.flag(flag: ItemFlag) = addItemFlags(flag)
 
 fun ItemMeta.attributes(body: Attributes.() -> Unit) {
     if (attributeModifiers == null)

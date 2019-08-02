@@ -18,7 +18,7 @@ val item: ItemStack = item {
         displayName = "Grass block of doom"
         lore = "A very\npowerful weapon" // instead of Lists, normal Strings with new lines are used for lore
         unbreakable = true
-        flags.add(ItemFlag.UNBREAKABLE)
+        addItemFlags(ItemFlag.UNBREAKABLE)
         attributes {
             modify(Attribute.GENERIC_ATTACK_SPEED) with someModifier // both single modifiers and Lists of modifiers work here
         }   
