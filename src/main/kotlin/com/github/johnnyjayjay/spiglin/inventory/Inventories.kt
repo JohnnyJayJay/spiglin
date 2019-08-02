@@ -7,11 +7,10 @@ import org.bukkit.event.inventory.InventoryType
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemStack
-import java.lang.ref.WeakReference
 
 const val ROW_SIZE = 9
 
-fun inventory(
+inline fun inventory(
     rows: Int = 3,
     owner: InventoryHolder? = null,
     title: String = InventoryType.CHEST.defaultTitle,
@@ -20,7 +19,7 @@ fun inventory(
 
 infix fun Filler<ItemStack?>.except(positions: Iterable<Pair<Int, Int>>) {
     for (position in positions) {
-        val linear = linearInventoryIndex(position)
+        val linear = linearIndex(position)
         if (linear in target) {
             array[linear] = contentBackup.get()!![linear]
         }
@@ -28,7 +27,7 @@ infix fun Filler<ItemStack?>.except(positions: Iterable<Pair<Int, Int>>) {
 }
 
 infix fun Filler<ItemStack?>.except(position: Pair<Int, Int>) {
-    val linear = linearInventoryIndex(position)
+    val linear = linearIndex(position)
     if (linear in target) {
         array[linear] = contentBackup.get()!![linear]
     }
@@ -38,7 +37,7 @@ fun Inventory.fill(target: IntRange = contents.indices): Filler<ItemStack?> = co
 
 inline fun Inventory.forEachSlot(action: (Int, Int) -> Unit) {
     forEachSlotLinear {
-        val (row, column) = twoDimensionalInventoryIndex(it)
+        val (row, column) = twoDimensionalIndex(it)
         action(row, column)
     }
 }
@@ -59,10 +58,10 @@ fun items(formatString: String, bindings: Map<Char, ItemStack?>): Array<ItemStac
 }
 
 operator fun Inventory.get(row: Int, column: Int): ItemStack? =
-    contents[linearInventoryIndex(row, column)]
+    contents[linearIndex(row, column)]
 
 operator fun Inventory.set(row: Int, column: Int, stack: ItemStack?) {
-    contents[linearInventoryIndex(row, column)] = stack
+    contents[linearIndex(row, column)] = stack
 }
 
 operator fun Inventory.get(index: Int): ItemStack? = contents[index]
@@ -79,6 +78,4 @@ operator fun Inventory.set(position: Pair<Int, Int>, item: ItemStack?) {
 
 operator fun Inventory.get(range: IntRange): Array<ItemStack?> = contents.copyOfRange(range.first, range.last)
 
-fun Inventory.openTo(player: Player) {
-    player.openInventory(this)
-}
+fun Inventory.openTo(player: Player) = player.openInventory(this)
