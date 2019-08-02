@@ -4,9 +4,10 @@ import org.bukkit.enchantments.Enchantment
 
 class EnchantmentNode {
 
-    internal val set: MutableSet<EnchantmentContainer> = mutableSetOf()
+    val set: MutableSet<EnchantmentContainer> = mutableSetOf()
 
-    fun enchant(unrestricted: Boolean = false) = EnchantmentContainer(unrestricted)
+    fun enchant(unrestricted: Boolean = false) =
+        EnchantmentContainer(unrestricted).also { set.add(it) }
 }
 
 data class EnchantmentContainer internal constructor(val unrestricted: Boolean) {

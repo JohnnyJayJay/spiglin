@@ -10,12 +10,12 @@ import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.meta.ItemMeta
 import java.lang.IllegalArgumentException
 
-inline fun <reified T : ItemMeta> itemMeta(material: Material, body: T.() -> Unit): T {
-    val meta = Bukkit.getItemFactory().getItemMeta(material)
-    return meta
+inline fun <reified T : ItemMeta> itemMeta(material: Material, body: T.() -> Unit) =
+    Bukkit.getItemFactory().getItemMeta(material)
         .let { it as? T }
+        ?.apply(body)
         ?: throw IllegalArgumentException("ItemMeta for provided material does not match actual type parameter")
-}
+
 
 var ItemMeta.stringLore: String?
     get() = lore?.joinToString("\n")

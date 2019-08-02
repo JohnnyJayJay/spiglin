@@ -10,9 +10,8 @@ with Bukkit's API, including two very small EDSLs (Embedded Domain Specific Lang
 This EDSL makes the creation of custom items very simple and concise. 
 Most of it is self-explanatory:
 ```kotlin
-val item: ItemStack = item {
-    type = Material.GRASS_BLOCK // required
-    amount = STACK // default is 1; "STACK" is a constant (=64)
+val item: ItemStack = item(Material.GRASS_BLOCK) {
+    amount = maxStackSize // default is 1
     enchantments {
         enchant(unrestricted = true) with Enchantment.FIRE_ASPECT level 3 // adds fire aspect 3 as an enchantment
     }
