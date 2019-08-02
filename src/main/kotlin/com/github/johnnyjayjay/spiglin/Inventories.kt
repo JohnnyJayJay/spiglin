@@ -151,9 +151,6 @@ data class Slot(val row: Int, val column: Int) {
         Validate.isTrue(row >= 0, "Row out of bounds")
     }
 
-    companion object {
-        val FIRST = Slot(0, 0)
-    }
 }
 
 internal data class ClickableItem(val stack: ItemStack, val action: (InventoryClickEvent) -> Unit) : ItemStack(stack)

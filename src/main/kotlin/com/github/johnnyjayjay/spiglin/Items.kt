@@ -12,7 +12,7 @@ import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
 
-val NEW_LINE_SPLIT = "\n".toRegex()
+internal val NEW_LINE_SPLIT = "\n".toRegex()
 
 const val STACK = 64
 
