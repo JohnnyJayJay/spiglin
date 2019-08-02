@@ -38,7 +38,7 @@ fun schedule(
 }
 
 inline fun repeat(
-    times: Int = -1,
+    range: IntRange,
     delay: Long = 0,
     period: Long = 20,
     plugin: Plugin,
@@ -46,14 +46,14 @@ inline fun repeat(
     crossinline task: BukkitRunnable.(Int) -> Unit
 ): BukkitTask {
     val runnable = object : BukkitRunnable() {
-        private var timesRun = 0
+        private var current = range.first
 
         override fun run() {
-            task(timesRun)
-            if (timesRun == times) {
+            task(current)
+            if (current == range.last) {
                 cancel()
             }
-            ++timesRun
+            current += range.step
         }
     }
 
@@ -63,15 +63,6 @@ inline fun repeat(
         runnable.runTaskTimer(plugin, delay, period)
     }
 }
-
-inline fun countdown(
-    from: Int,
-    delay: Long = 0,
-    period: Long = 20,
-    plugin: Plugin,
-    async: Boolean = false,
-    crossinline task: BukkitRunnable.(Int) -> Unit
-) = repeat(from, period, delay, plugin, async) { task(from - it) }
 
 internal class DelegatingRunnable(private val task: BukkitRunnable.() -> Unit) : BukkitRunnable() {
     override fun run() = task()

@@ -91,12 +91,10 @@ delay(ticks = 20 * 5, plugin = plugin) { }
 // .runTaskTimer
 schedule(delay = 20, period = 20 * 5, plugin = plugin) {} 
 
-// repeats n times
-repeat(times = 5, delay = 20, period = 20 * 5, plugin = plugin) { iteration ->
+// repeat from the beginning to the end of the range
+repeat(range = 1..5, delay = 20, period = 20 * 5, plugin = plugin) { current ->
     
 }
-// counts down from a set value (basically inverted repeat())
-countdown(from = 10, delay = 20, period = 20 * 5, plugin = plugin) { remaining ->
-
-}
 ```
+All of these functions also have an `async` parameter that can be used to 
+use them asynchronously.
