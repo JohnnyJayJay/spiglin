@@ -41,12 +41,7 @@ class ItemStackBuilder {
     }
 
     fun enchantments(body: EnchantmentNode.() -> Unit) {
-        val set = EnchantmentNode().apply(body).set
-        if (enchantments == null) {
-            enchantments = set
-        } else {
-            enchantments!!.addAll(set)
-        }
+        enchantments = EnchantmentNode().apply(body).set
     }
 
     fun build(): ItemStack {
