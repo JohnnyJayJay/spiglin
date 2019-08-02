@@ -24,15 +24,10 @@ class InventoryBuilder {
     var title: String = InventoryType.CHEST.defaultTitle
     var holder: InventoryHolder? = null
     var rows: Int = DEFAULT_ROWS
-        set(value) {
-            items = Items(rows)
-            field = value
-        }
-
-    private var items: Items = Items(rows % ROW_SIZE)
+    var items: Items = Items(0)
 
     fun items(body: Items.() -> Unit) {
-        items.body()
+        items = inventoryItems(rows, body)
     }
 
     fun build(plugin: Plugin? = null): Inventory {
@@ -114,7 +109,6 @@ class Items(rows: Int) {
         }
         return contents
     }
-
 }
 
 fun Inventory.setItems(items: Items) {
