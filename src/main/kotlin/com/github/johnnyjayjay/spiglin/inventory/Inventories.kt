@@ -1,6 +1,6 @@
 package com.github.johnnyjayjay.spiglin.inventory
 
-import com.github.johnnyjayjay.spiglin.NEW_LINE_SPLIT
+import com.github.johnnyjayjay.spiglin.item.NEW_LINE_SPLIT
 import org.apache.commons.lang.Validate
 import org.bukkit.Bukkit
 import org.bukkit.event.inventory.InventoryType

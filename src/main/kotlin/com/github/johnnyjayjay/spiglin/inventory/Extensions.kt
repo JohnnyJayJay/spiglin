@@ -8,12 +8,12 @@ const val ROW_SIZE = 9
 
 var Inventory.items: Items
     get() = Items.from(contents)
-    set(value) { contents = value.toContents() }
+    set(value) {
+        contents = value.toContents()
+    }
 
-operator fun Inventory.get(row: Int, column: Int): ItemStack? = contents[linearInventoryIndex(
-    row,
-    column
-)]
+operator fun Inventory.get(row: Int, column: Int): ItemStack? =
+    contents[linearInventoryIndex(row, column)]
 
 operator fun Inventory.set(row: Int, column: Int, stack: ItemStack?) {
     contents[linearInventoryIndex(row, column)] = stack
