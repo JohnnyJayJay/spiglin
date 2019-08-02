@@ -27,12 +27,36 @@ val item: ItemStack = item {
     }   
 }
 ```
+`ItemMeta`s can also be built without an item attached. See `<T> itemMeta(Material, T.() -> Unit)`.
+
 Note that some things (like `attributes`) are exclusive to certain Spigot versions. Just remember that this EDSL 
 is just a wrapper of what is possible anyway. If a certain feature does not exist in your version but does in Spiglin, 
 I highly discourage you from using it. You will most likely get runtime errors.
 
 If you are uncertain, check out the documentation for the individual methods and variables.
 
-### Inventory EDSL
-This EDSL works similar to the ItemStack EDSL and is fully compatible with it.
+### Inventory Utilities
+The inventory EDSL works similar to the ItemStack EDSL and is fully compatible with it.
+```kotlin
+val inventory: Inventory = inventory {
+    rows = 3
+    title = "Click the button"
+    items {
+        fillWith(item = borderItem, except = 1 rc 4) // fills every slot with the provided item, excluding the ones speficied in "except".
+        grid[1][4] = buttonItem withAction { event -> event.player.sendMessage("Click!") } // sets the item in the middle to "buttonItem" and attaches an action that is triggered should it be clicked.
+    }
+}
+```
+You may assign the `items` variable differently, by...
+```kotlin
+items = Items.from(contents) // ...providing linear inventory contents
+items = Items.from(grid) // ...providing a 2D array of ItemStacks (row-column)
+items = Items.from(
+    formatString = """
+            |xxxxbxxxx
+        """.trimMargin(), 
+    bindings = mapOf('x' to borderItem, 'b' to buttonItem)
+) // ...using a String format where every character represents an ItemStack!
+```
+Also, there are several extension functions and new operators for `Inventory`:
 

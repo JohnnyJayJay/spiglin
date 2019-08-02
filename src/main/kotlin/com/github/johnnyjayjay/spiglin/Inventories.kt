@@ -90,6 +90,8 @@ class Items(rows: Int) {
         }
     }
 
+
+
     fun toContents(): Array<ItemStack?> {
         val contents = Array<ItemStack?>(grid.size * ROW_SIZE) {}
         for (row in grid) {
@@ -131,9 +133,9 @@ class Items(rows: Int) {
     }
 }
 
-fun Inventory.setItems(items: Items) {
-    contents = items.toContents()
-}
+var Inventory.items: Items
+    get() = Items.from(contents)
+    set(value) { contents = value.toContents() }
 
 operator fun Inventory.get(slot: Slot): ItemStack? = contents[slot.oneDimensional]
 
