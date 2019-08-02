@@ -9,25 +9,28 @@ import org.bukkit.inventory.ItemStack
 
 object ItemInteractionListener : Listener {
 
-    internal val inventories: MutableMap<Inventory, Set<ClickableItem>> = mutableMapOf()
+    private val clickables: MutableSet<ClickableItem> = mutableSetOf()
 
     @EventHandler
     fun onClick(event: InventoryClickEvent) {
-        inventories[event.inventory]?.firstOrNull {
-            it == event.currentItem
-        }?.action(event)
+        val item = event.currentItem
+        if (item in clickables) {
+            (item as ClickableItem).action(event)
+        }
     }
 
     @EventHandler
     fun onClose(event: InventoryCloseEvent) {
-        if (event.inventory in inventories) {
-            inventories.remove(event.inventory)
-        }
+        clickables.removeAll(event.inventory.contents.filterIsInstance<ClickableItem>())
+    }
+
+    fun add(inventory: Inventory) {
+        clickables.addAll(inventory.contents.filterIsInstance<ClickableItem>())
     }
 
 }
 
-internal data class ClickableItem(val stack: ItemStack, val action: (InventoryClickEvent) -> Unit) : ItemStack(stack)
+data class ClickableItem(val stack: ItemStack, val action: (InventoryClickEvent) -> Unit) : ItemStack(stack)
 
 infix fun ItemStack.withAction(action: (InventoryClickEvent) -> Unit): ItemStack {
     return ClickableItem(this, action)
