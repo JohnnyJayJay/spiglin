@@ -11,7 +11,6 @@ import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.Plugin
-import java.util.*
 
 const val ROW_SIZE = 9
 
@@ -27,7 +26,7 @@ class InventoryBuilder {
     var rows: Int = DEFAULT_ROWS
     var items: Items = Items(0)
 
-    fun items(body: Items.() -> Unit) {
+    inline fun items(body: Items.() -> Unit) {
         items = inventoryItems(rows, body)
     }
 
@@ -72,17 +71,8 @@ class Items(rows: Int) {
     internal val clickables: Set<ClickableItem>
         get() {
             return grid
-                .asSequence()
-                .reduce { one, two ->
-                    val array = arrayOfNulls<ItemStack?>(one.size + two.size)
-                    for (i in one.indices)
-                        array[i] = one[i] as? ClickableItem
-                    for (i in two.indices)
-                        array[i] = two[i] as? ClickableItem
-                    array
-                }
-                .filterNotNull()
-                .map { it as ClickableItem }
+                .reduce(Array<ItemStack?>::plus)
+                .filterIsInstance<ClickableItem>()
                 .toSet()
         }
 
