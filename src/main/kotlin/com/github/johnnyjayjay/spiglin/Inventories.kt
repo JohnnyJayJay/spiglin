@@ -11,6 +11,7 @@ import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.Plugin
+import java.util.*
 
 const val ROW_SIZE = 9
 
@@ -108,6 +109,35 @@ class Items(rows: Int) {
             }
         }
         return contents
+    }
+
+    companion object {
+
+        fun from(formatString: String, bindings: Map<Char, ItemStack?>): Items {
+            val rows = formatString.split(NEW_LINE_SPLIT)
+            return from(rows.asSequence()
+                .map { it.toCharArray() }
+                .map { it.map(bindings::get) }
+                .map { it.toTypedArray() }
+                .toList().toTypedArray())
+        }
+
+        fun from(grid: Array<Array<ItemStack?>>): Items {
+            val items = Items(grid.size)
+            grid.forEachIndexed { row, _ ->
+                items.grid[row] = grid[row].copyOf(grid.size)
+            }
+            return items
+        }
+
+        fun from(contents: Array<ItemStack?>): Items {
+            val rowRemainder = contents.size % ROW_SIZE
+            Validate.isTrue(rowRemainder == 0, "Array size must be a multiple of ROW_SIZE")
+            val grid: Array<Array<ItemStack?>> = Array(contents.size / ROW_SIZE) { index ->
+                contents.sliceArray(index until index + 9)
+            }
+            return from(grid)
+        }
     }
 }
 

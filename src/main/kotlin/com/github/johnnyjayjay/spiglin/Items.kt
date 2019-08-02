@@ -12,7 +12,7 @@ import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
 
-val LORE_SPLIT_REGEX = "\n".toRegex()
+val NEW_LINE_SPLIT = "\n".toRegex()
 
 const val STACK = 64
 
@@ -87,7 +87,7 @@ data class EnchantmentContainer internal constructor(val unrestricted: Boolean) 
 var ItemMeta.stringLore: String?
     get() = lore?.joinToString("\n")
     set(value) {
-        lore = value?.split(LORE_SPLIT_REGEX)
+        lore = value?.split(NEW_LINE_SPLIT)
     }
 
 var ItemMeta.displayName: String?
