@@ -43,11 +43,15 @@ val inventory: Inventory = inventory {
     rows = 3
     title = "Click the button"
     items {
-        fillWith(item = borderItem, except = 1 to 4) // fills every slot with the provided item, excluding the ones speficied in "except".
+        fill() with borderItem except (1 to 4) // fills every slot with the provided item, excluding the ones speficied in "except" (also works with linear IntRanges or Iterable<Pair<Int, Int>>)
         grid[1, 4] = buttonItem withAction { event -> event.player.sendMessage("Click!") } // sets the item in the middle to "buttonItem" and attaches an action that is triggered should it be clicked.
+        forEachSlot { row, column -> println("$row - $column")} // you can also perform custom operations with forEachSlot
     }
 }
 ```
+In order for the interaction (`withAction`) to work, you need to register `ItemInteractionListener` as a listener 
+via the `PluginManager`.
+
 #### Items
 You may assign the `items` variable differently, by...
 ```kotlin
@@ -65,8 +69,13 @@ Also, there are a few extensions and new operators for `Inventory`:
 ```kotlin
 val item: ItemStack = inventory[1, 4] // retrieves the ItemStack at the specified slot (Pair<Int, Int> or a linear index can be used, too)
 inventory[1, 4] = newItemStack // sets the ItemStack at the specified slot (Pair<Int, Int> or a linear index can be used, too)
-val row: Array<ItemStack?> = inventory[row(0)] // retrieves a row from the inventory (takes an IntRange)
+val firstRow: Array<ItemStack?> = inventory[0..8] // retrieves a specific range of items from the inventory
 val items: Items = inventory.items // variable of type Items that can be retrieved...
 inventory.items = items // ...or re-assigned
 inventory.openTo(player) // player.openInventory(inventory)
+```
+There are some additional, independent utility functions:
+```kotlin
+val linearIndex = linearInventoryIndex(row = 1, column = 3) // converts a 2 dimensional index to a linear one (also works with Pair<Int, Int>)
+val (row, column) = twoDimensionalInventoryIndex(16) // converts a linear index to a Pair<Int, Int> that represent row and column of that index
 ```

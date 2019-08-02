@@ -11,6 +11,7 @@ import org.bukkit.enchantments.Enchantment
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
+import java.lang.IllegalArgumentException
 
 internal val NEW_LINE_SPLIT = "\n".toRegex()
 
@@ -21,10 +22,9 @@ inline fun item(body: ItemStackBuilder.() -> Unit) =
 
 inline fun <reified T : ItemMeta> itemMeta(material: Material, body: T.() -> Unit): T {
     val meta = Bukkit.getItemFactory().getItemMeta(material)
-    Validate.isTrue(meta is T, "ItemMeta for provided material does not match actual type parameter")
-    meta as T
-    meta.body()
     return meta
+        .let { it as? T }
+        ?: throw IllegalArgumentException("ItemMeta for provided material does not match actual type parameter")
 }
 
 class ItemStackBuilder {

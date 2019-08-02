@@ -7,7 +7,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 
-object ClickListener : Listener {
+object ItemInteractionListener : Listener {
 
     internal val inventories: MutableMap<Inventory, Set<ClickableItem>> = mutableMapOf()
 

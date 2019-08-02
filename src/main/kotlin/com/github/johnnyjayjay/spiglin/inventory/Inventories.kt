@@ -8,8 +8,7 @@ import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.Plugin
-
-const val ROW_SIZE = 9
+import java.lang.ref.WeakReference
 
 inline fun inventoryItems(rows: Int = 3, body: Items.() -> Unit) =
     Items(rows).apply(body)
@@ -32,7 +31,7 @@ class InventoryBuilder {
         val inventory = Bukkit.createInventory(holder, rows, title)
         inventory.items = items
         if (plugin != null) {
-            ClickListener.inventories[inventory] = items.clickables
+            ItemInteractionListener.inventories[inventory] = items.clickables
         }
         return inventory
     }
@@ -46,6 +45,7 @@ class InventoryBuilder {
 class Items(rows: Int) {
 
     val grid: Array<Array<ItemStack?>> = Array(rows) { arrayOfNulls(ROW_SIZE) }
+    val linearIndices: IntRange = 0 until linearInventoryIndex(rows, 8)
 
     internal val clickables: Set<ClickableItem>
         get() {
@@ -55,18 +55,45 @@ class Items(rows: Int) {
                 .toSet()
         }
 
-    operator fun Array<Array<ItemStack?>>.get(row: Int, column: Int) = grid[row][column]
+    fun fill(target: IntRange = linearIndices) = Filler(target)
 
-    operator fun Array<Array<ItemStack?>>.set(row: Int, column: Int, item: ItemStack?) {
-        grid[row][column] = item
+    inner class Filler internal constructor(val target: IntRange) {
+
+        private val gridCopy = WeakReference(grid.map(Array<ItemStack?>::copyOf).toList().toTypedArray())
+
+        infix fun with(item: ItemStack?): Filler {
+            for (i in target) {
+                val (row, column) = twoDimensionalInventoryIndex(i)
+                grid[row, column] = item
+            }
+            return this
+        }
+
+        infix fun except(range: IntRange) {
+            for (i in range) {
+                val (row, column) = twoDimensionalInventoryIndex(i)
+                grid[row, column] = gridCopy.get()!![row, column]
+            }
+        }
+
+        infix fun except(positions: Iterable<Pair<Int, Int>>) {
+            for ((row, column) in positions) {
+                grid[row, column] = gridCopy.get()!![row, column]
+            }
+        }
+
+        infix fun except(position: Pair<Int, Int>) {
+            val (row, column) = position
+            if (linearInventoryIndex(row, column) in target) {
+                grid[row, column] = gridCopy.get()!![row, column]
+            }
+        }
     }
 
-    fun fillWith(item: ItemStack, vararg except: Pair<Int, Int> = emptyArray()) {
-        grid.forEachIndexed { x, row ->
-            row.forEachIndexed { y, _ ->
-                if (x to y !in except) {
-                    grid[x][y] = item
-                }
+    inline fun forEachSlot(action: (Int, Int) -> Unit) {
+        for (row in grid.indices) {
+            for (column in grid[row].indices) {
+                action(row, column)
             }
         }
     }

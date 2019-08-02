@@ -4,6 +4,8 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 
+const val ROW_SIZE = 9
+
 var Inventory.items: Items
     get() = Items.from(contents)
     set(value) { contents = value.toContents() }
@@ -40,4 +42,17 @@ fun Inventory.openTo(player: Player) {
     player.openInventory(this)
 }
 
-fun linearInventoryIndex(row: Int, column: Int) = row * ROW_SIZE + column
+operator fun <T> Array<Array<T>>.get(outer: Int, inner: Int) = this[outer][inner]
+
+operator fun <T> Array<Array<T>>.set(outer: Int, inner: Int, value: T) {
+    this[outer][inner] = value
+}
+
+fun linearInventoryIndex(position: Pair<Int, Int>) =
+    linearInventoryIndex(position.first, position.second)
+
+fun linearInventoryIndex(row: Int, column: Int) =
+    row * ROW_SIZE + column
+
+fun twoDimensionalInventoryIndex(linearIndex: Int) =
+    linearIndex / ROW_SIZE to linearIndex % ROW_SIZE
