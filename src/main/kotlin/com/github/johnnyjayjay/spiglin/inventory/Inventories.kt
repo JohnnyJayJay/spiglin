@@ -18,42 +18,23 @@ fun inventory(
     body: Inventory.() -> Unit
 ) = Bukkit.createInventory(owner, rows, title).apply(body)
 
-
-fun Inventory.fill(target: IntRange = contents.indices) = Filler(this, target)
-
-class Filler internal constructor(val inventory: Inventory, val target: IntRange) {
-
-    private val contentBackup = WeakReference(inventory.contents.copyOf())
-
-    infix fun with(item: ItemStack?): Filler {
-        for (i in target) {
-            inventory[i] = item
-        }
-        return this
-    }
-
-    infix fun except(range: IntRange) {
-        for (i in range) {
-            inventory[i] = contentBackup.get()!![i]
-        }
-    }
-
-    infix fun except(positions: Iterable<Pair<Int, Int>>) {
-        for (position in positions) {
-            val linear = linearInventoryIndex(position)
-            if (linear in target) {
-                inventory[linear] = contentBackup.get()!![linear]
-            }
-        }
-    }
-
-    infix fun except(position: Pair<Int, Int>) {
+infix fun Filler<ItemStack?>.except(positions: Iterable<Pair<Int, Int>>) {
+    for (position in positions) {
         val linear = linearInventoryIndex(position)
         if (linear in target) {
-            inventory[linear] = contentBackup.get()!![linear]
+            array[linear] = contentBackup.get()!![linear]
         }
     }
 }
+
+infix fun Filler<ItemStack?>.except(position: Pair<Int, Int>) {
+    val linear = linearInventoryIndex(position)
+    if (linear in target) {
+        array[linear] = contentBackup.get()!![linear]
+    }
+}
+
+fun Inventory.fill(target: IntRange = contents.indices): Filler<ItemStack?> = contents.fill(target)
 
 inline fun Inventory.forEachSlot(action: (Int, Int) -> Unit) {
     forEachSlotLinear {
