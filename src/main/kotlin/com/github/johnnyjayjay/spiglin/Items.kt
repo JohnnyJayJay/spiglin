@@ -35,19 +35,18 @@ class ItemStackBuilder {
     var meta: ItemMeta? = null
 
     private var enchantments: MutableSet<EnchantmentContainer>? = null
-        get() {
-            if (field == null) {
-                field = mutableSetOf()
-            }
-            return field
-        }
 
     inline fun <reified T : ItemMeta> meta(body: T.() -> Unit) {
         meta = itemMeta(type, body)
     }
 
     fun enchantments(body: EnchantmentNode.() -> Unit) {
-        enchantments!!.addAll(EnchantmentNode().apply(body).set)
+        val set = EnchantmentNode().apply(body).set
+        if (enchantments == null) {
+            enchantments = set
+        } else {
+            enchantments!!.addAll(set)
+        }
     }
 
     fun build(): ItemStack {
@@ -60,7 +59,7 @@ class ItemStackBuilder {
         return itemStack
     }
 
-    private fun ItemStack.addEnchantment(container: EnchantmentContainer) = with (container) {
+    private fun ItemStack.addEnchantment(container: EnchantmentContainer) = with(container) {
         if (unrestricted) {
             addUnsafeEnchantment(enchantment, level)
         } else {
