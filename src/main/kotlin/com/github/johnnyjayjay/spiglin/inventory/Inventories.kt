@@ -98,6 +98,9 @@ class Items(rows: Int) {
         }
     }
 
+    inline fun forEachSlotLinear(action: (Int) -> Unit) =
+        linearIndices.forEach(action)
+
     fun toContents(): Array<ItemStack?> {
         val contents = Array<ItemStack?>(grid.size * ROW_SIZE) {}
         for (row in grid) {

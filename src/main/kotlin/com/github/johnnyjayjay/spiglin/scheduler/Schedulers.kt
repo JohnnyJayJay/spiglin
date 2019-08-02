@@ -1,4 +1,4 @@
-package com.github.johnnyjayjay.spiglin
+package com.github.johnnyjayjay.spiglin.scheduler
 
 import org.bukkit.plugin.Plugin
 import org.bukkit.scheduler.BukkitRunnable
@@ -13,7 +13,7 @@ fun run(plugin: Plugin, async: Boolean = false, task: BukkitRunnable.() -> Unit)
     }
 }
 
-fun delay(ticks: Long, async: Boolean = false, plugin: Plugin, task: BukkitRunnable.() -> Unit): BukkitTask {
+fun delay(ticks: Long, plugin: Plugin, async: Boolean = false, task: BukkitRunnable.() -> Unit): BukkitTask {
     val runnable = DelegatingRunnable(task)
     return if (async) {
         runnable.runTaskLaterAsynchronously(plugin, ticks)
@@ -23,10 +23,10 @@ fun delay(ticks: Long, async: Boolean = false, plugin: Plugin, task: BukkitRunna
 }
 
 fun schedule(
-    plugin: Plugin,
-    async: Boolean = false,
     delay: Long = 0,
     period: Long = 20,
+    plugin: Plugin,
+    async: Boolean = false,
     task: BukkitRunnable.() -> Unit
 ): BukkitTask {
     val runnable = DelegatingRunnable(task)
@@ -38,11 +38,11 @@ fun schedule(
 }
 
 inline fun repeat(
-    plugin: Plugin,
-    async: Boolean = false,
+    times: Int = -1,
     delay: Long = 0,
     period: Long = 20,
-    times: Int = -1,
+    plugin: Plugin,
+    async: Boolean = false,
     crossinline task: BukkitRunnable.(Int) -> Unit
 ): BukkitTask {
     val runnable = object : BukkitRunnable() {
@@ -65,13 +65,13 @@ inline fun repeat(
 }
 
 inline fun countdown(
-    plugin: Plugin,
-    async: Boolean = false,
+    from: Int,
     delay: Long = 0,
     period: Long = 20,
-    from: Int,
+    plugin: Plugin,
+    async: Boolean = false,
     crossinline task: BukkitRunnable.(Int) -> Unit
-) =  repeat(plugin, async, delay, period, from) { task(from - it) }
+) = repeat(from, period, delay, plugin, async) { task(from - it) }
 
 internal class DelegatingRunnable(private val task: BukkitRunnable.() -> Unit) : BukkitRunnable() {
     override fun run() = task()

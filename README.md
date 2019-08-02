@@ -79,3 +79,24 @@ There are some additional, independent utility functions:
 val linearIndex = linearInventoryIndex(row = 1, column = 3) // converts a 2 dimensional index to a linear one (also works with Pair<Int, Int>)
 val (row, column) = twoDimensionalInventoryIndex(16) // converts a linear index to a Pair<Int, Int> that represent row and column of that index
 ```
+
+### Schedulers
+In the `scheduler` package, you can find convenient wrappers and extensions for the 
+scheduler actions available in Bukkit.
+```kotlin
+// .runTask
+run(plugin = plugin) { } 
+// .runTaskLater
+delay(ticks = 20 * 5, plugin = plugin) { } 
+// .runTaskTimer
+schedule(delay = 20, period = 20 * 5, plugin = plugin) {} 
+
+// repeats n times
+repeat(times = 5, delay = 20, period = 20 * 5, plugin = plugin) { iteration ->
+    
+}
+// counts down from a set value (basically inverted repeat())
+countdown(from = 10, delay = 20, period = 20 * 5, plugin = plugin) { remaining ->
+
+}
+```
