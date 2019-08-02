@@ -8,7 +8,6 @@ import org.bukkit.Material
 import org.bukkit.attribute.Attribute
 import org.bukkit.attribute.AttributeModifier
 import org.bukkit.enchantments.Enchantment
-import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
 
@@ -45,10 +44,6 @@ class ItemStackBuilder {
         enchantments!!.addAll(EnchantmentNode().apply(body).set)
     }
 
-    fun meta(body: ItemMeta.() -> Unit) {
-        meta = itemMeta(material = type, body = body)
-    }
-
     fun build(): ItemStack {
         val itemStack = ItemStack(type, amount)
         enchantments?.forEach { itemStack.addEnchantment(it) }
@@ -57,7 +52,7 @@ class ItemStackBuilder {
     }
 
     private fun ItemStack.addEnchantment(container: EnchantmentContainer) = with (container) {
-        if (flag) {
+        if (unrestricted) {
             addUnsafeEnchantment(enchantment, level)
         } else {
             addEnchantment(enchantment, level)
@@ -69,10 +64,10 @@ class EnchantmentNode {
 
     internal val set: MutableSet<EnchantmentContainer> = mutableSetOf()
 
-    fun enchant(flag: Boolean = false) = EnchantmentContainer(flag)
+    fun enchant(unrestricted: Boolean = false) = EnchantmentContainer(unrestricted)
 }
 
-data class EnchantmentContainer(val flag: Boolean) {
+data class EnchantmentContainer(val unrestricted: Boolean) {
     lateinit var enchantment: Enchantment
     var level: Int = 1
 
@@ -86,7 +81,7 @@ data class EnchantmentContainer(val flag: Boolean) {
     }
 }
 
-var ItemMeta.lore: String?
+var ItemMeta.stringLore: String?
     get() = lore?.joinToString("\n")
     set(value) {
         lore = value?.split(LORE_SPLIT_REGEX)
@@ -112,7 +107,7 @@ fun ItemMeta.attributes(body: Attributes.() -> Unit) {
 
 fun ItemMeta.enchantments(body: EnchantmentNode.() -> Unit) {
     EnchantmentNode().apply(body).set.forEach {
-        addEnchant(it.enchantment, it.level, it.flag)
+        addEnchant(it.enchantment, it.level, it.unrestricted)
     }
 }
 
