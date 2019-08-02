@@ -13,16 +13,19 @@ Most of it is self-explanatory:
 val item: ItemStack = item {
     type = Material.GRASS_BLOCK // required
     amount = STACK // default is 1; "STACK" is a constant (=64)
-    enchant(unsafe = true) with Enchantment.FIRE_ASPECT level 3 // adds fire aspect 3 as an enchantment
+    enchantments {
+        enchant(unrestricted = true) with Enchantment.FIRE_ASPECT level 3 // adds fire aspect 3 as an enchantment
+    }
     meta { // opens the ItemMeta scope in which properties of ItemMeta can be configured
         displayName = "Grass block of doom"
         lore = "A very\npowerful weapon" // instead of Lists, normal Strings with new lines are used for lore
         unbreakable = true
-        addItemFlags(ItemFlag.UNBREAKABLE)
+        flag(ItemFlag.HIDE_UNBREAKABLE)
         attributes {
             modify(Attribute.GENERIC_ATTACK_SPEED) with someModifier // both single modifiers and Lists of modifiers work here
         }   
     }   
 }
 ```
+
 

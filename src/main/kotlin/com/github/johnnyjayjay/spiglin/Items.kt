@@ -30,6 +30,7 @@ inline fun <reified T : ItemMeta> itemMeta(material: Material, body: T.() -> Uni
 class ItemStackBuilder {
 
     lateinit var type: Material
+    var durability: Short? = null
     var amount: Int = 1
     var meta: ItemMeta? = null
 
@@ -47,6 +48,9 @@ class ItemStackBuilder {
 
     fun build(): ItemStack {
         val itemStack = ItemStack(type, amount)
+        if (durability != null) {
+            itemStack.durability = durability!!
+        }
         enchantments?.forEach { itemStack.addEnchantment(it) }
         itemStack.itemMeta = meta
         return itemStack
