@@ -49,11 +49,9 @@ inline fun repeat(
         private var iterator = progression.iterator()
 
         override fun run() {
-            if (!iterator.hasNext()) {
-                return
-            }
-            task(iterator.next())
             if (iterator.hasNext()) {
+                task(iterator.next())
+            } else {
                 cancel()
             }
         }
