@@ -13,7 +13,8 @@ inline fun item(copy: ItemStack, body: ItemStack.() -> Unit) =
     ItemStack(copy).apply(body)
 
 inline fun <reified T : ItemMeta> ItemStack.meta(body: T.() -> Unit) {
-    itemMeta = itemMeta(type, body)
+    val newMeta = itemMeta(type, body)
+    itemMeta = newMeta
 }
 
 inline fun ItemStack.enchantments(body: EnchantmentNode.() -> Unit) {
