@@ -1,6 +1,7 @@
 package com.github.johnnyjayjay.spiglin.inventory
 
 import com.github.johnnyjayjay.spiglin.item.NEW_LINE_SPLIT
+import org.apache.commons.lang.Validate
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -202,6 +203,27 @@ fun Inventory.column(index: Int): IntProgression {
 }
 
 /**
+ * Returns an [Iterable] containing the linear slot indices of the borders of this inventory,
+ * with an optional padding.
+ *
+ * @param padding A value that determines the additional "thickness" of the border.
+ *                By default, this is 0 which means that the border will be 1 item thick.
+ * @throws IllegalArgumentException If the padding is negative
+ * @throws IndexOutOfBoundsException If the padding is too thick for this inventory
+ */
+fun Inventory.borders(padding: Int = 0): Iterable<Int> {
+    Validate.isTrue(padding >= 0, "Padding must not be negative")
+    val borders = mutableSetOf<Int>()
+    for (i in 0..padding) {
+        borders.addAll(row(0 + i))
+        borders.addAll(row(lastRowIndex - i))
+        borders.addAll(column(0 + i))
+        borders.addAll(column(8 - i))
+    }
+    return borders
+}
+
+/**
  * A variable determining if [InteractiveInventoryListener] should hook on this inventory
  * and listen for clicked items.
  * If this is set to true, clicks on [ClickableInventoryItem]s in this inventory will trigger their action.
@@ -219,6 +241,19 @@ var Inventory.interactive: Boolean
             InteractiveInventoryListener.remove(this)
         }
     }
+
+/**
+ * An [Iterable] containing the linear slot indices of the corners of this inventory.
+ */
+val Inventory.corners: Iterable<Int>
+    get() = slots(0 to 0, 0 to 8, lastRowIndex to 0, lastRowIndex to 8)
+
+/**
+ * The index of the last row of this inventory, in a two-dimensional context.
+ * Equivalent to rows - 1
+ */
+val Inventory.lastRowIndex: Int
+    get() = rows - 1
 
 /**
  * All linear slot indices in this inventory.
