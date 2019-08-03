@@ -35,10 +35,10 @@ I highly discourage you from using it. You will most likely get runtime errors.
 If you are uncertain, check out the documentation for the individual methods and variables.
 
 ### Inventory Utilities
-#### Builder EDSL
 The inventory EDSL works similar to the ItemStack EDSL and is fully compatible with it.
 ```kotlin
 val inventory: Inventory = inventory(rows = 3, title = "Click the button") {
+    // you can assign the contents directly or use the get/set operators
     this[all except slot(1, 4)] = borderItem // fills every slot with the provided item, excluding the ones speficied in "except" (also works with linear IntRanges or Iterable<Pair<Int, Int>>)
     this[slot(1, 4)] = buttonItem withAction { event -> event.player.sendMessage("Click!") }
     forEachSlot { row, column -> println("$row - $column")} // you can also perform custom operations with forEachSlot
@@ -49,32 +49,26 @@ Note that the only supported inventory type is `InventoryType.CHEST`!
 In order for the interaction (`withAction`) to work, you need to register `ItemInteractionListener` as a listener 
 via the `PluginManager`.
 
-#### Items
-You may assign the `items` variable differently, by...
+There are several other utility functions:
 ```kotlin
-items = Items.from(contents) // ...providing linear inventory contents
-items = Items.from(grid) // ...providing a 2D array of ItemStacks (row-column)
-items = Items.from(
-    formatString = """
-            |xxxxbxxxx
-        """.trimMargin(), 
-    bindings = mapOf('x' to borderItem, 'b' to buttonItem)
-) // ...using a String format where every character represents an ItemStack!
+val itemsInFirstRow: List<ItemStack?> = inventory[inventory.row(0)]
+val itemsInFirstColumn: List<ItemStack?> = inventory[inventory.column(0)]
+val itemsInSpecificSlots: List<ItemStack?> = inventory[slots(0 to 2, 1 to 3, 2 to 4)]
+val allItems: List<ItemStack?> = inventory[inventory.all]
+val itemsInRange: List<ItemStack?> = inventory[slot(1, 0)..slot(2, 3)]
+val itemInFirstSlot: ItemStack? = inventory[slot(0, 0)]
 ```
-#### Extensions
-Also, there are a few extensions and new operators for `Inventory`:
+Of course, there are also operator overloads for setting items this way.
+
+The inventory `get()/set()` operators are very flexible because they either generally 
+accept `Int` or `Iterable<Int>`. Both represent linear indices, i.e. the same indices
+that are used to access `inventory.contents`.
+
+In these examples, utility functions like `slot(Int, Int)` were used to convert two 
+dimensional indices (row - column) to linear ones. You may of course directly use 
+linear indices, like so:
 ```kotlin
-val item: ItemStack = inventory[1, 4] // retrieves the ItemStack at the specified slot (Pair<Int, Int> or a linear index can be used, too)
-inventory[1, 4] = newItemStack // sets the ItemStack at the specified slot (Pair<Int, Int> or a linear index can be used, too)
-val firstRow: Array<ItemStack?> = inventory[0..8] // retrieves a specific range of items from the inventory
-val items: Items = inventory.items // variable of type Items that can be retrieved...
-inventory.items = items // ...or re-assigned
-inventory.openTo(player) // player.openInventory(inventory)
-```
-There are some additional, independent utility functions:
-```kotlin
-val linearIndex = linearInventoryIndex(row = 1, column = 3) // converts a 2 dimensional index to a linear one (also works with Pair<Int, Int>)
-val (row, column) = twoDimensionalInventoryIndex(16) // converts a linear index to a Pair<Int, Int> that represent row and column of that index
+val item = inventory[23]
 ```
 
 ### Schedulers
@@ -88,8 +82,8 @@ delay(ticks = 20 * 5, plugin = plugin) { }
 // .runTaskTimer
 schedule(delay = 20, period = 20 * 5, plugin = plugin) {} 
 
-// repeat from the beginning to the end of the range
-repeat(range = 1..5, delay = 20, period = 20 * 5, plugin = plugin) { current ->
+// repeat from the beginning to the end of the provided progression
+repeat(progression = 1..5, delay = 20, period = 20 * 5, plugin = plugin) { current ->
     
 }
 ```

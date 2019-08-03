@@ -38,7 +38,7 @@ fun schedule(
 }
 
 inline fun repeat(
-    progression: Iterable<Int>,
+    progression: IntProgression,
     delay: Long = 0,
     period: Long = 20,
     plugin: Plugin,
@@ -50,7 +50,7 @@ inline fun repeat(
 
         override fun run() {
             if (iterator.hasNext()) {
-                task(iterator.next())
+                task(iterator.nextInt())
             } else {
                 cancel()
             }

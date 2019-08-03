@@ -1,12 +1,15 @@
 package com.github.johnnyjayjay.spiglin.inventory
 
 import com.github.johnnyjayjay.spiglin.item.NEW_LINE_SPLIT
+import org.apache.commons.lang.Validate
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryType
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemStack
+import java.lang.IndexOutOfBoundsException
+import kotlin.contracts.contract
 
 typealias Slot = Pair<Int, Int>
 
@@ -47,7 +50,7 @@ operator fun Inventory.set(index: Int, item: ItemStack?) {
     contents[index] = item
 }
 
-operator fun Inventory.get(indices: Iterable<Int>) = indices.map { this[it] }.toList()
+operator fun Inventory.get(indices: Iterable<Int>) = indices.map { this[it] }
 
 operator fun Inventory.set(indices: Iterable<Int>, item: ItemStack?) {
     for (i in indices) {
@@ -65,12 +68,14 @@ operator fun Inventory.set(indices: Iterable<Int>, items: Iterable<ItemStack?>) 
 
 fun Inventory.openTo(player: Player) = player.openInventory(this)
 
-fun Inventory.row(index: Int): IntProgression {
+fun Inventory.row(index: Int): IntRange {
+    checkBounds(index, 0 until 9, "Row")
     val start = slot(index, 0)
     return start until start + ROW_SIZE
 }
 
 fun Inventory.column(index: Int): IntProgression {
+    checkBounds(index, 0 until rows, "Column")
     val start = slot(0, index)
     return start until (rows - 1 + index) step 9
 }
@@ -80,3 +85,9 @@ val Inventory.all: IntRange
 
 val Inventory.rows: Int
     get() = size / ROW_SIZE
+
+private fun checkBounds(index: Int, bounds: IntRange, name: String) {
+    if (index !in bounds) {
+        throw IndexOutOfBoundsException("$name index out of bounds")
+    }
+}
