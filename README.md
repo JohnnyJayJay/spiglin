@@ -38,16 +38,14 @@ If you are uncertain, check out the documentation for the individual methods and
 #### Builder EDSL
 The inventory EDSL works similar to the ItemStack EDSL and is fully compatible with it.
 ```kotlin
-val inventory: Inventory = inventory {
-    rows = 3
-    title = "Click the button"
-    items {
-        fill() with borderItem except (1 to 4) // fills every slot with the provided item, excluding the ones speficied in "except" (also works with linear IntRanges or Iterable<Pair<Int, Int>>)
-        grid[1, 4] = buttonItem withAction { event -> event.player.sendMessage("Click!") } // sets the item in the middle to "buttonItem" and attaches an action that is triggered should it be clicked.
-        forEachSlot { row, column -> println("$row - $column")} // you can also perform custom operations with forEachSlot
-    }
+val inventory: Inventory = inventory(rows = 3, title = "Click the button") {
+    this[all except slot(1, 4)] = borderItem // fills every slot with the provided item, excluding the ones speficied in "except" (also works with linear IntRanges or Iterable<Pair<Int, Int>>)
+    this[slot(1, 4)] = buttonItem withAction { event -> event.player.sendMessage("Click!") }
+    forEachSlot { row, column -> println("$row - $column")} // you can also perform custom operations with forEachSlot
 }
 ```
+Note that the only supported inventory type is `InventoryType.CHEST`!
+
 In order for the interaction (`withAction`) to work, you need to register `ItemInteractionListener` as a listener 
 via the `PluginManager`.
 

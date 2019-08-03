@@ -38,7 +38,7 @@ fun schedule(
 }
 
 inline fun repeat(
-    range: IntRange,
+    progression: Iterable<Int>,
     delay: Long = 0,
     period: Long = 20,
     plugin: Plugin,
@@ -46,13 +46,13 @@ inline fun repeat(
     crossinline task: BukkitRunnable.(Int) -> Unit
 ): BukkitTask {
     val runnable = object : BukkitRunnable() {
-        private var iterator = range.iterator()
+        private var iterator = progression.iterator()
 
         override fun run() {
             if (!iterator.hasNext()) {
                 return
             }
-            task(iterator.nextInt())
+            task(iterator.next())
             if (iterator.hasNext()) {
                 cancel()
             }

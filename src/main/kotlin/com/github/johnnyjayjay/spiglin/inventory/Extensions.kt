@@ -1,16 +1,18 @@
 package com.github.johnnyjayjay.spiglin.inventory
 
-fun linearIndex(position: Pair<Int, Int>) =
-    linearIndex(position.first, position.second)
+fun slot(slot: Slot) =
+    slot(slot.first, slot.second)
 
-fun linearIndex(row: Int, column: Int) =
+fun slot(row: Int, column: Int) =
     row * ROW_SIZE + column
 
-fun twoDimensionalIndex(linearIndex: Int) =
-    linearIndex / ROW_SIZE to linearIndex % ROW_SIZE
+fun slots(vararg slots: Slot): Iterable<Int> = slots.map(::slot)
 
-val Pair<Int, Int>.linear
-    get() = linearIndex(first, second)
+fun Int.toSlot(): Slot =
+    this / ROW_SIZE to this % ROW_SIZE
 
-val Int.twoDimensional
-    get() = twoDimensionalIndex(this)
+
+infix fun <T> Iterable<T>.except(element: T) = this - element
+
+infix fun <T> Iterable<T>.except(elements: Iterable<T>) = this - elements
+

@@ -8,6 +8,8 @@ import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemStack
 
+typealias Slot = Pair<Int, Int>
+
 const val ROW_SIZE = 9
 
 inline fun inventory(
@@ -19,7 +21,7 @@ inline fun inventory(
 
 inline fun Inventory.forEachSlot(action: (Int, Int) -> Unit) {
     forEachSlotLinear {
-        val (row, column) = twoDimensionalIndex(it)
+        val (row, column) = it.toSlot()
         action(row, column)
     }
 }
@@ -39,42 +41,37 @@ fun items(formatString: String, bindings: Map<Char, ItemStack?>): Array<ItemStac
         .toTypedArray()
 }
 
-operator fun Inventory.get(row: Int, column: Int): ItemStack? =
-    contents[linearIndex(row, column)]
-
-operator fun Inventory.set(row: Int, column: Int, stack: ItemStack?) {
-    contents[linearIndex(row, column)] = stack
-}
-
 operator fun Inventory.get(index: Int): ItemStack? = contents[index]
 
 operator fun Inventory.set(index: Int, item: ItemStack?) {
     contents[index] = item
 }
 
-operator fun Inventory.get(position: Pair<Int, Int>) = this[position.first, position.second]
+operator fun Inventory.get(indices: Iterable<Int>) = indices.map { this[it] }.toList()
 
-operator fun Inventory.set(position: Pair<Int, Int>, item: ItemStack?) {
-    this[position.first, position.second] = item
-}
-
-operator fun Inventory.get(indices: IntProgression): Array<ItemStack?> = contents.copyOfRange(indices.first, indices.last)
-
-operator fun Inventory.set(indices: IntProgression, item: ItemStack?) {
+operator fun Inventory.set(indices: Iterable<Int>, item: ItemStack?) {
     for (i in indices) {
         this[i] = item
+    }
+}
+
+operator fun Inventory.set(indices: Iterable<Int>, items: Iterable<ItemStack?>) {
+    val indexIterator = indices.iterator()
+    val itemIterator = items.iterator()
+    while (indexIterator.hasNext() && itemIterator.hasNext()) {
+        this[indexIterator.next()] = itemIterator.next()
     }
 }
 
 fun Inventory.openTo(player: Player) = player.openInventory(this)
 
 fun Inventory.row(index: Int): IntProgression {
-    val start = linearIndex(index, 0)
+    val start = slot(index, 0)
     return start until start + ROW_SIZE
 }
 
 fun Inventory.column(index: Int): IntProgression {
-    val start = linearIndex(0, index)
+    val start = slot(0, index)
     return start until (rows - 1 + index) step 9
 }
 
