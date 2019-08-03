@@ -10,13 +10,20 @@ import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.meta.ItemMeta
 import java.lang.IllegalArgumentException
 
+/**
+ * Creates a new ItemMeta based on a [Material] and applies the given body to it.
+ *
+ * @param T The ItemMeta type to be created.
+ */
 inline fun <reified T : ItemMeta> itemMeta(material: Material, body: T.() -> Unit) =
     Bukkit.getItemFactory().getItemMeta(material)
         .let { it as? T }
         ?.apply(body)
         ?: throw IllegalArgumentException("ItemMeta for provided material does not match actual type parameter")
 
-
+/**
+ * Returns the lore joined to a String with new lines, sets the lore by splitting the given String at \n.
+ */
 var ItemMeta.stringLore: String?
     get() = lore?.joinToString("\n")
     set(value) {
@@ -35,8 +42,10 @@ var ItemMeta.customModelData: Int?
         setCustomModelData(value)
     }
 
+/** Adds the given [ItemFlag]s to this ItemMeta. */
 fun ItemMeta.flags(vararg flags: ItemFlag) = addItemFlags(*flags)
 
+/** Adds the given [ItemFlag] to this ItemMeta. */
 fun ItemMeta.flag(flag: ItemFlag) = addItemFlags(flag)
 
 fun ItemMeta.attributes(body: Attributes.() -> Unit) {

@@ -30,10 +30,22 @@ object InteractiveItemListener : Listener {
     }
 }
 
+/**
+ * An ItemStack with two actions attached, one for [PlayerInteractEvent]s,
+ * and one for [InventoryClickEvent]s involving this item.
+ *
+ * @constructor Creates an [InteractiveItem] that derives from the given delegate ItemStack.
+ *              Changes to that ItemStack will not affect this [InteractiveItem].
+ */
 class InteractiveItem(delegate: ItemStack) : ItemStack(delegate) {
 
+    /** A boolean value determining whether interaction is enabled for this item. */
     var active: Boolean = true
+
+    /** A function called when this item is clicked in an inventory. */
     var clickAction: (InventoryClickEvent) -> Unit = {}
+
+    /** A function called when a player interacts with this item in their hand. */
     var interactAction: (PlayerInteractEvent) -> Unit = {}
 
     infix fun whenInteracted(interactAction: (PlayerInteractEvent) -> Unit) =
@@ -43,10 +55,19 @@ class InteractiveItem(delegate: ItemStack) : ItemStack(delegate) {
         this.apply { this.clickAction = clickAction }
 }
 
+/**
+ * Creates and returns a new [InteractiveItem] based on this ItemStack.
+ */
 fun ItemStack.interactive() = InteractiveItem(this)
 
+/**
+ * Creates a new [InteractiveItem], sets its [InteractiveItem.clickAction] and returns the result.
+ */
 infix fun ItemStack.whenClicked(clickAction: (InventoryClickEvent) -> Unit) =
     interactive() whenClicked clickAction
 
+/**
+ * Creates a new [InteractiveItem], sets its [InteractiveItem.interactAction] and returns the result.
+ */
 infix fun ItemStack.whenInteracted(interactAction: (PlayerInteractEvent) -> Unit) =
     interactive() whenInteracted interactAction

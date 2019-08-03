@@ -6,17 +6,32 @@ import org.bukkit.inventory.meta.ItemMeta
 
 internal val NEW_LINE_SPLIT = "\n".toRegex()
 
+/**
+ * Creates a new [ItemStack] based on the given type and applies the given function to it.
+ */
 inline fun item(type: Material, body: ItemStack.() -> Unit) =
     ItemStack(type).apply(body)
 
+/**
+ * Creates a new [ItemStack] based on another ItemStack and applies the given function to it.
+ */
 inline fun item(copy: ItemStack, body: ItemStack.() -> Unit) =
     ItemStack(copy).apply(body)
 
+/**
+ * Assigns and accesses this ItemStack's [ItemMeta].
+ *
+ * @see itemMeta
+ */
 inline fun <reified T : ItemMeta> ItemStack.meta(body: T.() -> Unit) {
     val newMeta = itemMeta(type, body)
     itemMeta = newMeta
 }
 
+/**
+ * Creates an [EnchantmentNode] for this ItemStack, applies the given
+ * body and adds all enchantments configured to this ItemStack.
+ */
 inline fun ItemStack.enchant(unsafe: Boolean = false, body: EnchantmentNode.() -> Unit) {
     val addMethod = if (unsafe) ::addUnsafeEnchantment else ::addEnchantment
     EnchantmentNode().apply(body).let {
