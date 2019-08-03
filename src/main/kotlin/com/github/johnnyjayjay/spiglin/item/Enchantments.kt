@@ -4,22 +4,25 @@ import org.bukkit.enchantments.Enchantment
 
 class EnchantmentNode {
 
-    val set: MutableSet<EnchantmentContainer> = mutableSetOf()
+    val set: MutableSet<Container> = mutableSetOf()
 
-    fun enchant(unrestricted: Boolean = false) =
-        EnchantmentContainer(unrestricted).also { set.add(it) }
-}
+    fun with(enchantment: Enchantment) =
+        Container(enchantment).also { set.add(it) }
 
-data class EnchantmentContainer internal constructor(val unrestricted: Boolean) {
-    lateinit var enchantment: Enchantment
-    var level: Int = 1
-
-    infix fun with(enchantment: Enchantment): EnchantmentContainer {
-        this.enchantment = enchantment
-        return this
+    inline fun with(vararg enchantments: Enchantment, config: Container.(Enchantment) -> Unit) {
+        enchantments.forEach {
+            with(it).apply { config(it) }
+        }
     }
 
-    infix fun level(level: Int) {
-        this.level = level
+    fun with(enchantments: Map<Enchantment, Int>) {
+        set.addAll(enchantments.map { Container(it.key, it.value) })
+    }
+
+    data class Container internal constructor(val enchantment: Enchantment, var level: Int = 1) {
+
+        infix fun level(level: Int) {
+            this.level = level
+        }
     }
 }

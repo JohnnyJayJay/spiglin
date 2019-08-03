@@ -45,9 +45,9 @@ fun ItemMeta.attributes(body: Attributes.() -> Unit) {
     attributeModifiers!!.putAll(Attributes().apply(body).modifiers)
 }
 
-fun ItemMeta.enchantments(body: EnchantmentNode.() -> Unit) {
+inline fun ItemMeta.enchant(ignoringRestrictions: Boolean = false, body: EnchantmentNode.() -> Unit) {
     EnchantmentNode().apply(body).set.forEach {
-        addEnchant(it.enchantment, it.level, it.unrestricted)
+        addEnchant(it.enchantment, it.level, ignoringRestrictions)
     }
 }
 

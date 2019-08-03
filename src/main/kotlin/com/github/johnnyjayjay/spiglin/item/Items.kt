@@ -17,12 +17,13 @@ inline fun <reified T : ItemMeta> ItemStack.meta(body: T.() -> Unit) {
     itemMeta = newMeta
 }
 
-inline fun ItemStack.enchantments(body: EnchantmentNode.() -> Unit) {
-    EnchantmentNode().apply(body).set.forEach {
-        if (it.unrestricted) {
-            addUnsafeEnchantment(it.enchantment, it.level)
-        } else {
-            addEnchantment(it.enchantment, it.level)
+inline fun ItemStack.enchant(unsafe: Boolean = false, body: EnchantmentNode.() -> Unit) {
+    val addMethod = if (unsafe) ::addUnsafeEnchantment else ::addEnchantment
+    EnchantmentNode().apply(body).let {
+        it.set.forEach { container ->
+            val (enchantment, level) = container
+            addMethod(enchantment, level)
         }
     }
 }
+

@@ -12,8 +12,8 @@ Most of it is self-explanatory:
 ```kotlin
 val item: ItemStack = item(Material.GRASS_BLOCK) {
     amount = maxStackSize // default is 1
-    enchantments {
-        enchant(unrestricted = true) with Enchantment.FIRE_ASPECT level 3 // adds fire aspect 3 as an enchantment
+    enchant(unsafe = true) {
+        with(Enchantment.FIRE_ASPECT) level 3 // adds fire aspect 3 as an enchantment
     }
     meta { // meta {} also has a type parameter that lets you work with more specific ItemMetas.
         displayName = "Grass block of doom"
@@ -68,7 +68,7 @@ In these examples, utility functions like `slot(Int, Int)` were used to convert 
 dimensional indices (row - column) to linear ones. You may of course directly use 
 linear indices, like so:
 ```kotlin
-val item = inventory[23]
+val item: ItemStack? = inventory[23]
 ```
 
 ### Schedulers
