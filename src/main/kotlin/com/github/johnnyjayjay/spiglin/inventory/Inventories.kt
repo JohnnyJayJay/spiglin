@@ -17,24 +17,6 @@ inline fun inventory(
     body: Inventory.() -> Unit
 ) = Bukkit.createInventory(owner, rows, title).apply(body)
 
-infix fun Filler<ItemStack?>.except(positions: Iterable<Pair<Int, Int>>) {
-    for (position in positions) {
-        val linear = linearIndex(position)
-        if (linear in target) {
-            array[linear] = contentBackup.get()!![linear]
-        }
-    }
-}
-
-infix fun Filler<ItemStack?>.except(position: Pair<Int, Int>) {
-    val linear = linearIndex(position)
-    if (linear in target) {
-        array[linear] = contentBackup.get()!![linear]
-    }
-}
-
-fun Inventory.fill(target: IntRange = contents.indices): Filler<ItemStack?> = contents.fill(target)
-
 inline fun Inventory.forEachSlot(action: (Int, Int) -> Unit) {
     forEachSlotLinear {
         val (row, column) = twoDimensionalIndex(it)
@@ -76,6 +58,28 @@ operator fun Inventory.set(position: Pair<Int, Int>, item: ItemStack?) {
     this[position.first, position.second] = item
 }
 
-operator fun Inventory.get(range: IntRange): Array<ItemStack?> = contents.copyOfRange(range.first, range.last)
+operator fun Inventory.get(indices: IntProgression): Array<ItemStack?> = contents.copyOfRange(indices.first, indices.last)
+
+operator fun Inventory.set(indices: IntProgression, item: ItemStack?) {
+    for (i in indices) {
+        this[i] = item
+    }
+}
 
 fun Inventory.openTo(player: Player) = player.openInventory(this)
+
+fun Inventory.row(index: Int): IntProgression {
+    val start = linearIndex(index, 0)
+    return start until start + ROW_SIZE
+}
+
+fun Inventory.column(index: Int): IntProgression {
+    val start = linearIndex(0, index)
+    return start until (rows - 1 + index) step 9
+}
+
+val Inventory.all: IntRange
+    get() = contents.indices
+
+val Inventory.rows: Int
+    get() = size / ROW_SIZE

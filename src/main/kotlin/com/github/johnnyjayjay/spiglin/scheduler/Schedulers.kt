@@ -46,14 +46,16 @@ inline fun repeat(
     crossinline task: BukkitRunnable.(Int) -> Unit
 ): BukkitTask {
     val runnable = object : BukkitRunnable() {
-        private var current = range.first
+        private var iterator = range.iterator()
 
         override fun run() {
-            task(current)
-            if (current == range.last) {
+            if (!iterator.hasNext()) {
+                return
+            }
+            task(iterator.nextInt())
+            if (iterator.hasNext()) {
                 cancel()
             }
-            current += range.step
         }
     }
 
