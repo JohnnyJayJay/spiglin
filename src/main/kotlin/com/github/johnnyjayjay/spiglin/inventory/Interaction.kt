@@ -7,7 +7,12 @@ import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 
-object ItemInteractionListener : Listener {
+/**
+ * A listener used to react to item clicks in registered inventories.
+ * It must be registered as a listener to Bukkit to enable interactive inventories.
+ * Everything apart from registering is handled internally.
+ */
+object InteractiveInventoryListener : Listener {
 
     private val inventories: MutableSet<Inventory> = mutableSetOf()
 
@@ -15,7 +20,7 @@ object ItemInteractionListener : Listener {
     fun onClick(event: InventoryClickEvent) {
         if (event.inventory in inventories) {
             val item = event.currentItem
-            if (item is ClickableItem) {
+            if (item is ClickableInventoryItem) {
                 item.action(event)
             }
         }
@@ -34,8 +39,18 @@ object ItemInteractionListener : Listener {
 
 }
 
-data class ClickableItem(val stack: ItemStack, val action: (InventoryClickEvent) -> Unit) : ItemStack(stack)
+/**
+ * An ItemStack with an action attached that will be executed should this ItemStack be
+ * clicked in an [interactive Inventory][Inventory.interactive].
+ *
+ * @property stack The [ItemStack][org.bukkit.inventory.ItemStack] this derives from.
+ * @property action The function to be called when this item is clicked in an interactive inventory.
+ */
+data class ClickableInventoryItem(val stack: ItemStack, val action: (InventoryClickEvent) -> Unit) : ItemStack(stack)
 
-infix fun ItemStack.withAction(action: (InventoryClickEvent) -> Unit): ItemStack {
-    return ClickableItem(this, action)
+/**
+ * Attaches an action to an existing ItemStack to create a [ClickableInventoryItem].
+ */
+infix fun ItemStack.withAction(action: (InventoryClickEvent) -> Unit): ClickableInventoryItem {
+    return ClickableInventoryItem(this, action)
 }
