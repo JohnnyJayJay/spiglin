@@ -1,15 +1,14 @@
 package com.github.johnnyjayjay.spiglin.inventory
 
 import com.github.johnnyjayjay.spiglin.item.NEW_LINE_SPLIT
-import org.apache.commons.lang.Validate
+import com.github.johnnyjayjay.spiglin.item.item
 import org.bukkit.Bukkit
+import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryType
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemStack
-import java.lang.IndexOutOfBoundsException
-import kotlin.contracts.contract
 
 typealias Slot = Pair<Int, Int>
 
@@ -64,6 +63,26 @@ operator fun Inventory.set(indices: Iterable<Int>, items: Iterable<ItemStack?>) 
     while (indexIterator.hasNext() && itemIterator.hasNext()) {
         this[indexIterator.next()] = itemIterator.next()
     }
+}
+
+operator fun Inventory.plusAssign(item: ItemStack) {
+    this.addItem(item)
+}
+
+operator fun Inventory.plusAssign(items: Iterable<ItemStack>) {
+    this.addItem(*items.toList().toTypedArray())
+}
+
+operator fun Inventory.minusAssign(item: ItemStack) {
+    this.remove(item)
+}
+
+operator fun Inventory.minusAssign(items: Iterable<ItemStack>) {
+    this.removeItem(*items.toList().toTypedArray())
+}
+
+operator fun Inventory.minusAssign(material: Material) {
+    this.remove(material)
 }
 
 fun Inventory.openTo(player: Player) = player.openInventory(this)
