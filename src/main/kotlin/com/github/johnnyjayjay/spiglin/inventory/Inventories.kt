@@ -224,25 +224,6 @@ fun Inventory.borders(padding: Int = 0): Iterable<Int> {
 }
 
 /**
- * A variable determining if [InteractiveInventoryListener] should hook on this inventory
- * and listen for clicked items.
- * If this is set to true, clicks on [ClickableInventoryItem]s in this inventory will trigger their action.
- *
- * Note that [InteractiveInventoryListener] needs to be registered as Listener for this to work!
- *
- * @see InteractiveInventoryListener
- */
-var Inventory.interactive: Boolean
-    get() = InteractiveInventoryListener.contains(this)
-    set(value) {
-        if (value) {
-            InteractiveInventoryListener.add(this)
-        } else {
-            InteractiveInventoryListener.remove(this)
-        }
-    }
-
-/**
  * An [Iterable] containing the linear slot indices of the corners of this inventory.
  */
 val Inventory.corners: Iterable<Int>

@@ -26,4 +26,3 @@ inline fun ItemStack.enchant(unsafe: Boolean = false, body: EnchantmentNode.() -
         }
     }
 }
-

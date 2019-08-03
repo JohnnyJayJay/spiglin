@@ -40,23 +40,26 @@ The inventory EDSL works similar to the ItemStack EDSL and is fully compatible w
 val inventory: Inventory = inventory(rows = 3, title = "Click the button") {
     // you can assign the contents directly or use the get/set operators
     this[all except slot(1, 4)] = borderItem // fills every slot with the provided item, excluding the ones speficied in "except" (also works with linear IntRanges or Iterable<Pair<Int, Int>>)
-    this[slot(1, 4)] = buttonItem withAction { event -> event.player.sendMessage("Click!") }
-    forEachSlot { row, column -> println("$row - $column")} // you can also perform custom operations with forEachSlot
+    this[slot(1, 4)] = buttonItem whenClicked { event -> event.player.sendMessage("Click!") }
 }
 ```
 Note that the only supported inventory type is `InventoryType.CHEST`!
 
-In order for the interaction (`withAction`) to work, you need to register `ItemInteractionListener` as a listener 
+In order for the interaction (`whenClicked`) to work, you need to register `ItemInteractionListener` as a listener 
 via the `PluginManager`.
 
 There are several other utility functions:
 ```kotlin
-val itemsInFirstRow: List<ItemStack?> = inventory[inventory.row(0)]
-val itemsInFirstColumn: List<ItemStack?> = inventory[inventory.column(0)]
-val itemsInSpecificSlots: List<ItemStack?> = inventory[slots(0 to 2, 1 to 3, 2 to 4)]
-val allItems: List<ItemStack?> = inventory[inventory.all]
-val itemsInRange: List<ItemStack?> = inventory[slot(1, 0)..slot(2, 3)]
-val itemInFirstSlot: ItemStack? = inventory[slot(0, 0)]
+with (inventory) {
+    val itemsInFirstRow = this[row(0)]
+    val itemsInFirstColumn = this[column(0)]
+    val itemsInSpecificSlots = this[slots(0 to 2, 1 to 3, 2 to 4)]
+    val borderItems = this[border()]
+    val cornerItems = this[corners]
+    val itemsInRange = this[slot(1, 0)..slot(2, 3)]
+    val allItems = this[all]
+    val itemInFirstSlot = inventory[slot(0, 0)]
+}
 ```
 Of course, there are also operator overloads for setting items this way.
 
