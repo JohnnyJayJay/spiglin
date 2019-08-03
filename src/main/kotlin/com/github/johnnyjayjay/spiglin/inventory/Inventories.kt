@@ -80,6 +80,16 @@ fun Inventory.column(index: Int): IntProgression {
     return start until (rows - 1 + index) step 9
 }
 
+var Inventory.interactive: Boolean
+    get() = ItemInteractionListener.contains(this)
+    set(value) {
+        if (value) {
+            ItemInteractionListener.add(this)
+        } else {
+            ItemInteractionListener.remove(this)
+        }
+    }
+
 val Inventory.all: IntRange
     get() = contents.indices
 
