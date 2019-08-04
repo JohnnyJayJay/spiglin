@@ -17,11 +17,14 @@ fun Player.feed() {
     foodLevel = 20
 }
 
-fun Player.hide(players: Iterable<Player>) =
-    players.forEach { hidePlayer(this) }
+fun Player.hideFrom(vararg players: Player) =
+    players.forEach { it.hidePlayer(this) }
 
-fun Player.hide() =
-    hide(Bukkit.getOnlinePlayers())
+fun Player.hideFrom(players: Iterable<Player>) =
+    players.forEach { it.hidePlayer(this) }
+
+fun Player.hideFromAll() =
+    hideFrom(Bukkit.getOnlinePlayers())
 
 fun <T> Player.play(location: Location = this.location, effect: Effect, data: T? = null) =
     playEffect(location, effect, data)
