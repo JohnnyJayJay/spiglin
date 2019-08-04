@@ -1,10 +1,21 @@
 package com.github.johnnyjayjay.spiglin.item
 
+import com.github.johnnyjayjay.spiglin.inventory.get
+import com.google.common.collect.ArrayListMultimap
+import com.google.common.collect.Multimap
+import org.bukkit.event.Cancellable
+import org.bukkit.event.Event
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.event.player.PlayerInteractEvent
+import org.bukkit.event.block.BlockDropItemEvent
+import org.bukkit.event.enchantment.EnchantItemEvent
+import org.bukkit.event.entity.EntityDropItemEvent
+import org.bukkit.event.entity.EntityPickupItemEvent
+import org.bukkit.event.entity.ItemMergeEvent
+import org.bukkit.event.inventory.*
+import org.bukkit.event.player.*
 import org.bukkit.inventory.ItemStack
+import java.util.function.Consumer
 
 /**
  * A listener used to react to [InteractiveItem] actions.
@@ -14,20 +25,47 @@ import org.bukkit.inventory.ItemStack
 object InteractiveItemListener : Listener {
 
     @EventHandler
-    fun onClick(event: InventoryClickEvent) {
-        val item = event.currentItem
-        if (item is InteractiveItem && item.active) {
-            item.clickAction(event)
+    fun onEvent(event: Event) {
+        val item = when (event) {
+            is PlayerInteractEvent -> event.item
+            is PlayerDropItemEvent -> event.itemDrop.itemStack
+            is PlayerItemBreakEvent -> event.brokenItem
+            is PlayerItemConsumeEvent -> event.item
+            is PlayerItemDamageEvent -> event.item
+            is PlayerItemHeldEvent -> event.player.inventory[event.newSlot]
+            is PlayerItemMendEvent -> event.item
+            is PlayerRiptideEvent -> event.item
+            is PlayerSwapHandItemsEvent -> {
+                if (event.mainHandItem !is InteractiveItem && event.offHandItem is InteractiveItem) {
+                    event.offHandItem
+                } else {
+                    event.mainHandItem
+                }
+            }
+            is PlayerTakeLecternBookEvent -> event.book
+            is EntityPickupItemEvent -> event.item.itemStack
+            is EntityDropItemEvent -> event.itemDrop.itemStack
+            is ItemMergeEvent -> event.entity.itemStack
+            is EnchantItemEvent -> event.item
+            is InventoryClickEvent -> event.currentItem
+            is InventoryDragEvent -> event.oldCursor
+            is InventoryMoveItemEvent -> event.item
+            is InventoryPickupItemEvent -> event.item.itemStack
+            is BlockDropItemEvent -> {
+                event.items.asSequence()
+                    .map { it.itemStack }
+                    .filterIsInstance<InteractiveItem>()
+                    .forEach { it.call(event) }
+                return
+            }
+            else -> null
+        }
+
+        if (item is InteractiveItem) {
+            item.call(event)
         }
     }
 
-    @EventHandler
-    fun onInteract(event: PlayerInteractEvent) {
-        val item = event.item
-        if (item is InteractiveItem && item.active) {
-            item.interactAction(event)
-        }
-    }
 }
 
 /**
@@ -39,35 +77,46 @@ object InteractiveItemListener : Listener {
  */
 class InteractiveItem(delegate: ItemStack) : ItemStack(delegate) {
 
+    private val events: Multimap<Class<out Event>, Consumer<Event>> = ArrayListMultimap.create()
+
     /** A boolean value determining whether interaction is enabled for this item. */
     var active: Boolean = true
 
-    /** A function called when this item is clicked in an inventory. */
-    var clickAction: (InventoryClickEvent) -> Unit = {}
+    fun <T : Event> attach(eventClass: Class<T>, action: Consumer<T>?) {
+        @Suppress("UNCHECKED_CAST")
+        events.put(eventClass, action as Consumer<Event>)
+    }
 
-    /** A function called when a player interacts with this item in their hand. */
-    var interactAction: (PlayerInteractEvent) -> Unit = {}
+    fun <T : Event> detach(eventClass: Class<T>, action: Consumer<T>) {
+        events.remove(eventClass, action)
+    }
 
-    infix fun whenInteracted(interactAction: (PlayerInteractEvent) -> Unit) =
-        this.apply { this.interactAction = interactAction }
+    fun <T : Event> detachAll(eventClass: Class<T>) {
+        events.removeAll(eventClass)
+    }
 
-    infix fun whenClicked(clickAction: (InventoryClickEvent) -> Unit) =
-        this.apply { this.clickAction = clickAction }
+    fun call(event: Event) {
+        events[event.javaClass]
+            ?.forEach { it.accept(event) }
+    }
 }
 
 /**
- * Creates and returns a new [InteractiveItem] based on this ItemStack.
+ * If this ItemStack is an instance of [InteractiveItem], returns this;
+ * Otherwise creates and returns a new [InteractiveItem] based on this ItemStack.
  */
-fun ItemStack.interactive() = InteractiveItem(this)
+fun ItemStack.interactive() =
+    if (this is InteractiveItem) this else InteractiveItem(this)
 
-/**
- * Creates a new [InteractiveItem], sets its [InteractiveItem.clickAction] and returns the result.
- */
-infix fun ItemStack.whenClicked(clickAction: (InventoryClickEvent) -> Unit) =
-    interactive() whenClicked clickAction
+inline infix fun <reified T : Event> ItemStack.attach(action: Consumer<T>): InteractiveItem {
+    val interactive = interactive()
+    interactive.attach(T::class.java, action)
+    return interactive
+}
 
-/**
- * Creates a new [InteractiveItem], sets its [InteractiveItem.interactAction] and returns the result.
- */
-infix fun ItemStack.whenInteracted(interactAction: (PlayerInteractEvent) -> Unit) =
-    interactive() whenInteracted interactAction
+fun <T : Cancellable> cancel(event: T) {
+    event.isCancelled = true
+}
+
+fun <T> action(action: (T) -> Unit) = Consumer(action)
+
