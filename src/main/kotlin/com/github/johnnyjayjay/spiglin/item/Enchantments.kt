@@ -5,7 +5,6 @@ import org.bukkit.enchantments.Enchantment
 /**
  * A class used to apply enchantments to ItemMetas and ItemStacks.
  *
- * @property set A [Set] containing the [EnchantmentContainer]s created within this node.
  * @see org.bukkit.inventory.ItemStack.enchant
  * @see org.bukkit.inventory.meta.ItemMeta.enchant
  */
@@ -13,6 +12,9 @@ class EnchantmentNode {
 
     private val _set: MutableSet<EnchantmentContainer> = mutableSetOf()
 
+    /**
+     * A [Set] containing the [EnchantmentContainer]s created within this node.
+     */
     val set: Set<EnchantmentContainer> = _set
 
     /**
@@ -39,7 +41,9 @@ class EnchantmentNode {
     }
 }
 
-
+/**
+ * A data class to represent an [Enchantment] with a level.
+ */
 data class EnchantmentContainer internal constructor(val enchantment: Enchantment, var level: Int = 1) {
 
     /**
