@@ -34,19 +34,30 @@ I highly discourage you from using it. You will most likely get runtime errors.
 
 If you are uncertain, check out the documentation for the individual methods and variables.
 
+### Interactive Items
+Spiglin provides a special kind of `ItemStack` called `InteractiveItem`. It is used to attach 
+actions to `ItemStack`s that are executed on specific events that involve this `ItemStack`.
+To get an interactive version of an `ItemStack`, you can call `ItemStack#toInteractiveItem()` 
+or `interactive(ItemStack)`.
+
+Attaching an action to an `InteractiveItem` works like this:
+```kotlin
+val button = interactive(item) // creates a new, interactive version of the item
+button attach Action<PlayerInteractEvent> { it.player.kill() } // attaches an action
+player.inventory += button // adds the item to the player's inventory
+```
+This action will be executed if a PlayerInteractEvent involves this item.
+
 ### Inventory Utilities
 The inventory EDSL works similar to the ItemStack EDSL and is fully compatible with it.
 ```kotlin
 val inventory: Inventory = inventory(rows = 3, title = "Click the button") {
     // you can assign the contents directly or use the get/set operators
-    this[all except slot(1, 4)] = borderItem // fills every slot with the provided item, excluding the ones speficied in "except" (also works with linear IntRanges or Iterable<Pair<Int, Int>>)
-    this[slot(1, 4)] = buttonItem whenClicked { event -> event.player.sendMessage("Click!") }
+    this[slot(1, 4)] = buttonItem
+    this[all except slot(1, 4)] = borderItem // fills every slot with the provided item, excluding the ones speficied in "except" (also works with linear Iterable<Int>)
 }
 ```
 Note that the only supported inventory type is `InventoryType.CHEST`!
-
-In order for the interaction (`whenClicked`) to work, you need to register `ItemInteractionListener` as a listener 
-via the `PluginManager`.
 
 There are several other utility functions:
 ```kotlin

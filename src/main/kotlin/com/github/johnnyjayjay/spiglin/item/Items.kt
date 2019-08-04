@@ -7,16 +7,18 @@ import org.bukkit.inventory.meta.ItemMeta
 internal val NEW_LINE_SPLIT = "\n".toRegex()
 
 /**
- * Creates a new [ItemStack] based on the given type and applies the given function to it.
+ * Creates a new [ItemStack] based on the given type and applies the given body to it.
  */
-inline fun item(type: Material, body: ItemStack.() -> Unit) =
-    ItemStack(type).apply(body)
+inline fun item(type: Material, interactive: Boolean = false, body: ItemStack.() -> Unit) =
+    (if (interactive) InteractiveItem(ItemStack(type)) else ItemStack(type)).apply(body)
 
 /**
- * Creates a new [ItemStack] based on another ItemStack and applies the given function to it.
+ * Creates a new [ItemStack] based on another ItemStack and applies the given body to it.
+ *
+ * @param interactive Whether this item should be an instance
  */
-inline fun item(copy: ItemStack, body: ItemStack.() -> Unit) =
-    ItemStack(copy).apply(body)
+inline fun item(copy: ItemStack, interactive: Boolean = false, body: ItemStack.() -> Unit) =
+    (if (interactive) InteractiveItem(copy) else ItemStack(copy)).apply(body)
 
 /**
  * Assigns and accesses this ItemStack's [ItemMeta].

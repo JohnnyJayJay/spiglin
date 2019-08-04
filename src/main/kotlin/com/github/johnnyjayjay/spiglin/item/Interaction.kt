@@ -16,6 +16,7 @@ import org.bukkit.event.inventory.*
 import org.bukkit.event.player.*
 import org.bukkit.inventory.ItemStack
 import java.util.function.Consumer
+import kotlin.reflect.KClass
 
 /**
  * A listener used to react to [InteractiveItem] actions.
@@ -77,18 +78,26 @@ object InteractiveItemListener : Listener {
  */
 class InteractiveItem(delegate: ItemStack) : ItemStack(delegate) {
 
-    private val events: Multimap<Class<out Event>, Consumer<Event>> = ArrayListMultimap.create()
+    private val events: Multimap<KClass<out Event>, Consumer<Event>> = ArrayListMultimap.create()
 
-    fun <T : Event> attach(eventClass: Class<T>, action: Action<T>?) {
+    inline infix fun <reified T : Event> attach(action: Action<T>) {
+        attach(T::class, action)
+    }
+
+    inline infix fun <reified T : Event> detach(action: Action<T>) {
+        detach(T::class, action)
+    }
+
+    fun <T : Event> attach(eventClass: KClass<T>, action: Action<T>?) {
         @Suppress("UNCHECKED_CAST")
         events.put(eventClass, action as Consumer<Event>)
     }
 
-    fun <T : Event> detach(eventClass: Class<T>, action: Action<T>) {
+    fun <T : Event> detach(eventClass: KClass<T>, action: Action<T>) {
         events.remove(eventClass, action)
     }
 
-    fun <T : Event> detachAll(eventClass: Class<T>) {
+    fun <T : Event> detachAll(eventClass: KClass<T>) {
         events.removeAll(eventClass)
     }
 
@@ -97,23 +106,14 @@ class InteractiveItem(delegate: ItemStack) : ItemStack(delegate) {
     }
 
     fun call(event: Event) {
-        events[event.javaClass]
+        events[event.javaClass.kotlin]
             ?.forEach { it.accept(event) }
     }
 }
 
-/**
- * If this ItemStack is an instance of [InteractiveItem], returns this;
- * Otherwise creates and returns a new [InteractiveItem] based on this ItemStack.
- */
-fun ItemStack.interactive() =
-    if (this is InteractiveItem) this else InteractiveItem(this)
+fun ItemStack.toInteractiveItem() = interactive(this)
 
-inline infix fun <reified T : Event> ItemStack.attach(action: Action<T>): InteractiveItem {
-    val interactive = interactive()
-    interactive.attach(T::class.java, action)
-    return interactive
-}
+fun interactive(item: ItemStack) = InteractiveItem(item)
 
 fun <T : Cancellable> cancel(event: T) {
     event.isCancelled = true
