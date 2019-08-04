@@ -1,5 +1,7 @@
 package com.github.johnnyjayjay.spiglin.item
 
+import com.google.common.collect.ArrayListMultimap
+import com.google.common.collect.ListMultimap
 import com.google.common.collect.Multimap
 import com.google.common.collect.Multimaps
 import org.bukkit.Bukkit
@@ -49,9 +51,7 @@ fun ItemMeta.flags(vararg flags: ItemFlag) = addItemFlags(*flags)
 fun ItemMeta.flag(flag: ItemFlag) = addItemFlags(flag)
 
 fun ItemMeta.attributes(body: Attributes.() -> Unit) {
-    if (attributeModifiers == null)
-        attributeModifiers = Multimaps.newListMultimap(mutableMapOf()) { mutableListOf() }
-    attributeModifiers!!.putAll(Attributes().apply(body).modifiers)
+    attributeModifiers = ArrayListMultimap.create(Attributes().apply(body).modifiers)
 }
 
 inline fun ItemMeta.enchant(ignoringRestrictions: Boolean = false, body: EnchantmentNode.() -> Unit) {
