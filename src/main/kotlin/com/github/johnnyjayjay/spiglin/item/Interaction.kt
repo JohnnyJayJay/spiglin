@@ -79,20 +79,21 @@ class InteractiveItem(delegate: ItemStack) : ItemStack(delegate) {
 
     private val events: Multimap<Class<out Event>, Consumer<Event>> = ArrayListMultimap.create()
 
-    /** A boolean value determining whether interaction is enabled for this item. */
-    var active: Boolean = true
-
-    fun <T : Event> attach(eventClass: Class<T>, action: Consumer<T>?) {
+    fun <T : Event> attach(eventClass: Class<T>, action: Action<T>?) {
         @Suppress("UNCHECKED_CAST")
         events.put(eventClass, action as Consumer<Event>)
     }
 
-    fun <T : Event> detach(eventClass: Class<T>, action: Consumer<T>) {
+    fun <T : Event> detach(eventClass: Class<T>, action: Action<T>) {
         events.remove(eventClass, action)
     }
 
     fun <T : Event> detachAll(eventClass: Class<T>) {
         events.removeAll(eventClass)
+    }
+
+    fun detachAll() {
+        events.clear()
     }
 
     fun call(event: Event) {
@@ -108,7 +109,7 @@ class InteractiveItem(delegate: ItemStack) : ItemStack(delegate) {
 fun ItemStack.interactive() =
     if (this is InteractiveItem) this else InteractiveItem(this)
 
-inline infix fun <reified T : Event> ItemStack.attach(action: Consumer<T>): InteractiveItem {
+inline infix fun <reified T : Event> ItemStack.attach(action: Action<T>): InteractiveItem {
     val interactive = interactive()
     interactive.attach(T::class.java, action)
     return interactive
@@ -118,5 +119,5 @@ fun <T : Cancellable> cancel(event: T) {
     event.isCancelled = true
 }
 
-fun <T> action(action: (T) -> Unit) = Consumer(action)
+typealias Action<T> = Consumer<T>
 
