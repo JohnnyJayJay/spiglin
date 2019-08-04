@@ -1,9 +1,6 @@
 package com.github.johnnyjayjay.spiglin.item
 
-import com.google.common.collect.ArrayListMultimap
-import com.google.common.collect.ListMultimap
-import com.google.common.collect.Multimap
-import com.google.common.collect.Multimaps
+import com.google.common.collect.*
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.attribute.Attribute
@@ -51,7 +48,11 @@ fun ItemMeta.flags(vararg flags: ItemFlag) = addItemFlags(*flags)
 fun ItemMeta.flag(flag: ItemFlag) = addItemFlags(flag)
 
 fun ItemMeta.attributes(body: Attributes.() -> Unit) {
-    attributeModifiers = ArrayListMultimap.create(Attributes().apply(body).modifiers)
+    val attributes = Attributes().apply(body)
+    val modifiers = attributes.modifiers
+    attributeModifiers = ArrayListMultimap.create(
+        if (attributeModifiers == null) ArrayListMultimap.create() else attributeModifiers
+    ).also { it.putAll(modifiers) }
 }
 
 inline fun ItemMeta.enchant(ignoringRestrictions: Boolean = false, body: EnchantmentNode.() -> Unit) {
