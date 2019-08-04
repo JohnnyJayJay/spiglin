@@ -41,13 +41,6 @@ fun Player.play(
 fun Player.play(location: Location = this.location, instrument: Instrument, note: Note) =
     playNote(location,  instrument, note)
 
-fun effect(
-    type: PotionEffectType,
-    duration: Int = Int.MAX_VALUE,
-    amplifier: Int = 1,
-    ambient: Boolean = true,
-    particles: Boolean = true,
-    icon: Boolean = true
-) = PotionEffect(type, duration, amplifier, ambient, particles, icon)
+
 
 
