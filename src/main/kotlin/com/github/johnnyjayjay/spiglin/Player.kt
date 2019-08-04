@@ -1,15 +1,16 @@
 package com.github.johnnyjayjay.spiglin
 
 import org.bukkit.*
+import org.bukkit.entity.Damageable
 import org.bukkit.entity.Player
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 
-fun Player.kill() {
+fun Damageable.kill() {
     health = 0.0
 }
 
-fun Player.heal() {
+fun Damageable.heal() {
     health = maxHealth
 }
 
