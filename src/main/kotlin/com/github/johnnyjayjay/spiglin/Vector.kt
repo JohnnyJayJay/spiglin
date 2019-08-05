@@ -35,6 +35,13 @@ operator fun Vector.timesAssign(vector: Vector) {
     dot(vector)
 }
 
+operator fun Vector.div(vector: Vector) =
+    clone().divide(vector)
+
+operator fun Vector.divAssign(vector: Vector) {
+    divide(vector)
+}
+
 infix fun Vector.x(vector: Vector) =
     clone().crossProduct(vector)
 
