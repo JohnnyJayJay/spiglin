@@ -7,6 +7,15 @@ import kotlin.math.sqrt
 fun Vector.abs() =
     sqrt(x.pow(2) + y.pow(2) + z.pow(2))
 
+operator fun Vector.unaryMinus() =
+    clone().apply { x = -x; y = -y; z = -z; }
+
+operator fun Vector.unaryPlus() =
+    clone().apply { x = +x; y = +y; z = +z; }
+
+operator fun Vector.compareTo(other: Vector) =
+    this.abs().compareTo(other.abs())
+
 operator fun Vector.times(scalar: Number) =
     clone().multiply(scalar.toDouble())
 
