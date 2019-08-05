@@ -6,7 +6,14 @@ for the Minecraft server software [Spigot/Bukkit](https://www.spigotmc.org/).
 Spiglin provides several different components that improve certain parts of interacting 
 with Bukkit's API, including two very small EDSLs (Embedded Domain Specific Language).
 
-### Item Building EDSL
+The following components of the Bukkit API are covered and extended by this collection:
+
+- `ItemStack`
+- `Inventory`
+- `Player`
+- `Vector & Location`
+
+### Items
 This EDSL makes the creation of custom items very simple and concise. 
 Most of it is self-explanatory:
 ```kotlin
@@ -50,7 +57,7 @@ player.inventory += button // adds the item to the player's inventory
 ```
 This action will be executed if a PlayerInteractEvent involves this item.
 
-### Inventory Utilities
+### Inventories
 The inventory EDSL works similar to the ItemStack EDSL and is fully compatible with it.
 ```kotlin
 val inventory: Inventory = inventory(rows = 3, title = "Click the button") {
@@ -105,3 +112,27 @@ repeat(progression = 1..5, delay = 20, period = 20 * 5, plugin = plugin) { curre
 ```
 All of these functions also have an `async` parameter that can be used to 
 use them asynchronously.
+
+### Player
+```kotlin
+player.kill() // Applicable to any other Damageable
+player.heal() // ""
+player.feed()
+player.hideFrom(otherPlayer) // hides this player from the provided player. Also takes varargs or Iterable<Player>
+player.hideIf { !it.hasPermission("see") } // hides this player from all players matching the given predicate
+player.hideFromAll() // Makes this player invisible for all players
+player.play(effect = Effect.ANVIL_BREAK) // various utility functions with default parameters for #playSound, #playNote and #playEffect
+```
+
+### Vector & Location
+This mainly adds operator overloading to these components.
+```kotlin
+val euclideanNorm = vector.abs
+val negated = -vector // respectively: +vector
+val isGreater = vector > otherVector // comparison based on the euclidean norm (also ==, !=, >=, <=, <)
+val added = vector + otherVector
+val subtracted = vector - otherVector
+val dotProduct = vector * otherVector
+val divided = vector / otherVector
+val crossProduct = vector x otherVector
+```

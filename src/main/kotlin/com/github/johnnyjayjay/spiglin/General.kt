@@ -7,7 +7,7 @@ import org.bukkit.inventory.Recipe
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 
-val players: Collection<Player>
+val onlinePlayers: Collection<Player>
     get() = Bukkit.getOnlinePlayers()
 
 fun broadcast(message: String) = Bukkit.broadcastMessage(message)

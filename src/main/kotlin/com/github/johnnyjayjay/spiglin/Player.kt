@@ -22,8 +22,14 @@ fun Player.hideFrom(vararg players: Player) =
 fun Player.hideFrom(players: Iterable<Player>) =
     players.forEach { it.hidePlayer(this) }
 
+inline fun Player.hideIf(crossinline predicate: (Player) -> Boolean) {
+    onlinePlayers.asSequence()
+        .filter { predicate(it) }
+        .forEach(Player::hideFrom)
+}
+
 fun Player.hideFromAll() =
-    hideFrom(Bukkit.getOnlinePlayers())
+    hideFrom(onlinePlayers)
 
 fun <T> Player.play(location: Location = this.location, effect: Effect, data: T? = null) =
     playEffect(location, effect, data)
