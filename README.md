@@ -43,7 +43,9 @@ or `interactive(ItemStack)`.
 Attaching an action to an `InteractiveItem` works like this:
 ```kotlin
 val button = interactive(item) // creates a new, interactive version of the item
-button attach Action<PlayerInteractEvent> { it.player.kill() } // attaches an action
+    .attach(PlayerInteractEvent::class) { // attaches an action
+        it.player.kill() 
+    } 
 player.inventory += button // adds the item to the player's inventory
 ```
 This action will be executed if a PlayerInteractEvent involves this item.

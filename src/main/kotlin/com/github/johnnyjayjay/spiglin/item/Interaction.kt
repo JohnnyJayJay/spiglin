@@ -80,24 +80,28 @@ class InteractiveItem(delegate: ItemStack) : ItemStack(delegate) {
 
     private val events: Multimap<KClass<out Event>, (Event) -> Unit> = ArrayListMultimap.create()
 
-    fun <T : Event> attach(eventClass: KClass<T>, action: (T) -> Unit) {
+    fun <T : Event> attach(eventClass: KClass<T>, action: (T) -> Unit): InteractiveItem {
         @Suppress("UNCHECKED_CAST")
         events.put(eventClass, action as (Event) -> Unit)
+        return this
     }
 
-    fun <T : Event> detach(eventClass: KClass<T>, action: (T) -> Unit) {
+    fun <T : Event> detach(eventClass: KClass<T>, action: (T) -> Unit): InteractiveItem {
         events.remove(eventClass, action)
+        return this
     }
 
-    fun <T : Event> detachAll(eventClass: KClass<T>) {
+    fun <T : Event> detachAll(eventClass: KClass<T>): InteractiveItem {
         events.removeAll(eventClass)
+        return this
     }
 
-    fun detachAll() {
+    fun detachAll(): InteractiveItem {
         events.clear()
+        return this
     }
 
-    fun call(event: Event) {
+    internal fun call(event: Event) {
         events[event.javaClass.kotlin]
             ?.forEach { it(event) }
     }
