@@ -1,7 +1,8 @@
 package com.github.johnnyjayjay.spiglin
 
-import org.bukkit.NamespacedKey
-import org.bukkit.inventory.*
+import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.ShapedRecipe
+import org.bukkit.inventory.ShapelessRecipe
 
 inline fun shapedRecipe(result: ItemStack, body: ShapedRecipe.() -> Unit) =
     ShapedRecipe(result).apply(body)

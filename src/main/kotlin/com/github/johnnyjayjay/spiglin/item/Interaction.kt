@@ -78,22 +78,14 @@ object InteractiveItemListener : Listener {
  */
 class InteractiveItem(delegate: ItemStack) : ItemStack(delegate) {
 
-    private val events: Multimap<KClass<out Event>, Consumer<Event>> = ArrayListMultimap.create()
+    private val events: Multimap<KClass<out Event>, (Event) -> Unit> = ArrayListMultimap.create()
 
-    inline infix fun <reified T : Event> attach(action: Action<T>) {
-        attach(T::class, action)
-    }
-
-    inline infix fun <reified T : Event> detach(action: Action<T>) {
-        detach(T::class, action)
-    }
-
-    fun <T : Event> attach(eventClass: KClass<T>, action: Action<T>?) {
+    fun <T : Event> attach(eventClass: KClass<T>, action: (T) -> Unit) {
         @Suppress("UNCHECKED_CAST")
-        events.put(eventClass, action as Consumer<Event>)
+        events.put(eventClass, action as (Event) -> Unit)
     }
 
-    fun <T : Event> detach(eventClass: KClass<T>, action: Action<T>) {
+    fun <T : Event> detach(eventClass: KClass<T>, action: (T) -> Unit) {
         events.remove(eventClass, action)
     }
 
@@ -107,7 +99,7 @@ class InteractiveItem(delegate: ItemStack) : ItemStack(delegate) {
 
     fun call(event: Event) {
         events[event.javaClass.kotlin]
-            ?.forEach { it.accept(event) }
+            ?.forEach { it(event) }
     }
 }
 
@@ -118,6 +110,4 @@ fun interactive(item: ItemStack) = InteractiveItem(item)
 fun <T : Cancellable> cancel(event: T) {
     event.isCancelled = true
 }
-
-typealias Action<T> = Consumer<T>
 
