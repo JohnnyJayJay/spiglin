@@ -12,10 +12,12 @@ import org.bukkit.event.enchantment.EnchantItemEvent
 import org.bukkit.event.entity.EntityDropItemEvent
 import org.bukkit.event.entity.EntityPickupItemEvent
 import org.bukkit.event.entity.ItemMergeEvent
-import org.bukkit.event.inventory.*
+import org.bukkit.event.inventory.InventoryClickEvent
+import org.bukkit.event.inventory.InventoryDragEvent
+import org.bukkit.event.inventory.InventoryMoveItemEvent
+import org.bukkit.event.inventory.InventoryPickupItemEvent
 import org.bukkit.event.player.*
 import org.bukkit.inventory.ItemStack
-import java.util.function.Consumer
 import kotlin.reflect.KClass
 
 /**
@@ -76,7 +78,7 @@ object InteractiveItemListener : Listener {
  * @constructor Creates an [InteractiveItem] that derives from the given delegate ItemStack.
  *              Changes to that ItemStack will not affect this [InteractiveItem].
  */
-class InteractiveItem(delegate: ItemStack) : ItemStack(delegate) {
+open class InteractiveItem(delegate: ItemStack) : ItemStack(delegate) {
 
     private val events: Multimap<KClass<out Event>, (Event) -> Unit> = ArrayListMultimap.create()
 
