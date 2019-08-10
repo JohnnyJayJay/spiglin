@@ -5,11 +5,20 @@ import org.bukkit.entity.Player
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 
+/**
+ * @see Bukkit.getOnlinePlayers
+ */
 val onlinePlayers: Collection<Player>
     get() = Bukkit.getOnlinePlayers()
 
+/**
+ * @see Bukkit.broadcastMessage
+ */
 fun broadcast(message: String) = Bukkit.broadcastMessage(message)
 
+/**
+ * @see PotionEffect constructor
+ */
 fun effect(
     type: PotionEffectType,
     duration: Int = Int.MAX_VALUE,

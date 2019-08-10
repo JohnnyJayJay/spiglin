@@ -129,10 +129,9 @@ This mainly adds operator overloading to these components.
 ```kotlin
 val euclideanNorm = vector.abs
 val negated = -vector // respectively: +vector
-val isGreater = vector > otherVector // comparison based on the euclidean norm (also ==, !=, >=, <=, <)
+val isGreater = vector > otherVector // comparison based on the euclidean norm (also >=, <=, <)
 val added = vector + otherVector
 val subtracted = vector - otherVector
 val dotProduct = vector * otherVector
-val divided = vector / otherVector
 val crossProduct = vector x otherVector
 ```
