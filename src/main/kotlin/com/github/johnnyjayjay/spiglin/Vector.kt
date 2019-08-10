@@ -11,7 +11,7 @@ operator fun Vector.unaryMinus() =
     clone().apply { x = -x; y = -y; z = -z; }
 
 operator fun Vector.unaryPlus() =
-    clone().apply { x = +x; y = +y; z = +z; }
+    clone()
 
 operator fun Vector.compareTo(other: Vector) =
     this.abs.compareTo(other.abs)
