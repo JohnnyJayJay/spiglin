@@ -36,15 +36,6 @@ object InteractiveItemListener : Listener {
             is PlayerItemConsumeEvent -> event.item
             is PlayerItemDamageEvent -> event.item
             is PlayerItemHeldEvent -> event.player.inventory[event.newSlot]
-            is PlayerItemMendEvent -> event.item
-            is PlayerRiptideEvent -> event.item
-            is PlayerSwapHandItemsEvent -> {
-                if (event.mainHandItem !is InteractiveItem && event.offHandItem is InteractiveItem) {
-                    event.offHandItem
-                } else {
-                    event.mainHandItem
-                }
-            }
             is PlayerTakeLecternBookEvent -> event.book
             is EntityPickupItemEvent -> event.item.itemStack
             is EntityDropItemEvent -> event.itemDrop.itemStack
