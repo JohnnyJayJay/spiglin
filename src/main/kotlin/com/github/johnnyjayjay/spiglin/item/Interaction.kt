@@ -1,5 +1,6 @@
 package com.github.johnnyjayjay.spiglin.item
 
+import com.github.johnnyjayjay.spiglin.Interactable
 import com.github.johnnyjayjay.spiglin.inventory.get
 import com.google.common.collect.ArrayListMultimap
 import com.google.common.collect.Multimap
@@ -69,35 +70,10 @@ object InteractiveItemListener : Listener {
  * @constructor Creates an [InteractiveItem] that derives from the given delegate ItemStack.
  *              Changes to that ItemStack will not affect this [InteractiveItem].
  */
-open class InteractiveItem(delegate: ItemStack) : ItemStack(delegate) {
+open class InteractiveItem(delegate: ItemStack) : ItemStack(delegate), Interactable<InteractiveItem> {
 
-    private val events: Multimap<KClass<out Event>, (Event) -> Unit> = ArrayListMultimap.create()
+    override val events: Multimap<KClass<out Event>, (Event) -> Unit> = ArrayListMultimap.create()
 
-    fun <T : Event> attach(eventClass: KClass<T>, action: (T) -> Unit): InteractiveItem {
-        @Suppress("UNCHECKED_CAST")
-        events.put(eventClass, action as (Event) -> Unit)
-        return this
-    }
-
-    fun <T : Event> detach(eventClass: KClass<T>, action: (T) -> Unit): InteractiveItem {
-        events.remove(eventClass, action)
-        return this
-    }
-
-    fun <T : Event> detachAll(eventClass: KClass<T>): InteractiveItem {
-        events.removeAll(eventClass)
-        return this
-    }
-
-    fun detachAll(): InteractiveItem {
-        events.clear()
-        return this
-    }
-
-    internal fun call(event: Event) {
-        events[event.javaClass.kotlin]
-            ?.forEach { it(event) }
-    }
 }
 
 fun ItemStack.toInteractiveItem() = interactive(this)
