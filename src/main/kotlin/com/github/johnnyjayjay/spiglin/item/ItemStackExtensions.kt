@@ -1,5 +1,6 @@
 package com.github.johnnyjayjay.spiglin.item
 
+import com.github.johnnyjayjay.spiglin.interaction.item.InteractiveItem
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta

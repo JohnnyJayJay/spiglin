@@ -1,10 +1,5 @@
-package com.github.johnnyjayjay.spiglin.item
+package com.github.johnnyjayjay.spiglin.interaction.item
 
-import com.github.johnnyjayjay.spiglin.Interactable
-import com.github.johnnyjayjay.spiglin.inventory.get
-import com.google.common.collect.ArrayListMultimap
-import com.google.common.collect.Multimap
-import org.bukkit.event.Cancellable
 import org.bukkit.event.Event
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -18,8 +13,6 @@ import org.bukkit.event.inventory.InventoryDragEvent
 import org.bukkit.event.inventory.InventoryMoveItemEvent
 import org.bukkit.event.inventory.InventoryPickupItemEvent
 import org.bukkit.event.player.*
-import org.bukkit.inventory.ItemStack
-import kotlin.reflect.KClass
 
 /**
  * A listener used to react to [InteractiveItem] actions.
@@ -62,25 +55,3 @@ object InteractiveItemListener : Listener {
     }
 
 }
-
-/**
- * An ItemStack with two actions attached, one for [PlayerInteractEvent]s,
- * and one for [InventoryClickEvent]s involving this item.
- *
- * @constructor Creates an [InteractiveItem] that derives from the given delegate ItemStack.
- *              Changes to that ItemStack will not affect this [InteractiveItem].
- */
-open class InteractiveItem(delegate: ItemStack) : ItemStack(delegate), Interactable<InteractiveItem> {
-
-    override val events: Multimap<KClass<out Event>, (Event) -> Unit> = ArrayListMultimap.create()
-
-}
-
-fun ItemStack.toInteractiveItem() = interactive(this)
-
-fun interactive(item: ItemStack) = InteractiveItem(item)
-
-fun <T : Cancellable> cancel(event: T) {
-    event.isCancelled = true
-}
-

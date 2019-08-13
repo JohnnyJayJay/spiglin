@@ -1,4 +1,4 @@
-package com.github.johnnyjayjay.spiglin
+package com.github.johnnyjayjay.spiglin.interaction
 
 import com.google.common.collect.Multimap
 import org.bukkit.event.Event
