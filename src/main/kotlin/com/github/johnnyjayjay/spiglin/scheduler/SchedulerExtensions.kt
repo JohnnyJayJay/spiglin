@@ -14,12 +14,12 @@ import org.bukkit.scheduler.BukkitTask
  * @see org.bukkit.scheduler.BukkitRunnable.runTask
  * @see org.bukkit.scheduler.BukkitRunnable.runTaskAsynchronously
  */
-fun run(plugin: Plugin, async: Boolean = false, task: BukkitRunnable.() -> Unit): BukkitTask {
+fun Plugin.run(async: Boolean = false, task: BukkitRunnable.() -> Unit): BukkitTask {
     val runnable = DelegatingRunnable(task)
     return if (async) {
-        runnable.runTaskAsynchronously(plugin)
+        runnable.runTaskAsynchronously(this)
     } else {
-        runnable.runTask(plugin)
+        runnable.runTask(this)
     }
 }
 
@@ -34,12 +34,12 @@ fun run(plugin: Plugin, async: Boolean = false, task: BukkitRunnable.() -> Unit)
  * @see org.bukkit.scheduler.BukkitRunnable.runTaskLater
  * @see org.bukkit.scheduler.BukkitRunnable.runTaskLaterAsynchronously
  */
-fun delay(ticks: Long, plugin: Plugin, async: Boolean = false, task: BukkitRunnable.() -> Unit): BukkitTask {
+fun Plugin.delay(ticks: Long, async: Boolean = false, task: BukkitRunnable.() -> Unit): BukkitTask {
     val runnable = DelegatingRunnable(task)
     return if (async) {
-        runnable.runTaskLaterAsynchronously(plugin, ticks)
+        runnable.runTaskLaterAsynchronously(this, ticks)
     } else {
-        runnable.runTaskLater(plugin, ticks)
+        runnable.runTaskLater(this, ticks)
     }
 }
 
@@ -56,18 +56,17 @@ fun delay(ticks: Long, plugin: Plugin, async: Boolean = false, task: BukkitRunna
  * @see org.bukkit.scheduler.BukkitRunnable.runTaskTimer
  * @see org.bukkit.scheduler.BukkitRunnable.runTaskTimerAsynchronously
  */
-fun schedule(
+fun Plugin.schedule(
     delay: Long = 0,
     period: Long = 20,
-    plugin: Plugin,
     async: Boolean = false,
     task: BukkitRunnable.() -> Unit
 ): BukkitTask {
     val runnable = DelegatingRunnable(task)
     return if (async) {
-        runnable.runTaskTimerAsynchronously(plugin, delay, period)
+        runnable.runTaskTimerAsynchronously(this, delay, period)
     } else {
-        runnable.runTaskTimer(plugin, delay, period)
+        runnable.runTaskTimer(this, delay, period)
     }
 }
 
@@ -85,11 +84,10 @@ fun schedule(
  *             and as long as there are elements left to progress. The parameter represents the current
  *             element in this progression.
  */
-inline fun repeat(
+inline fun Plugin.repeat(
     progression: IntProgression,
     delay: Long = 0,
     period: Long = 20,
-    plugin: Plugin,
     async: Boolean = false,
     crossinline task: BukkitRunnable.(Int) -> Unit
 ): BukkitTask {
@@ -106,9 +104,9 @@ inline fun repeat(
     }
 
     return if (async) {
-        runnable.runTaskTimerAsynchronously(plugin, delay, period)
+        runnable.runTaskTimerAsynchronously(this, delay, period)
     } else {
-        runnable.runTaskTimer(plugin, delay, period)
+        runnable.runTaskTimer(this, delay, period)
     }
 }
 

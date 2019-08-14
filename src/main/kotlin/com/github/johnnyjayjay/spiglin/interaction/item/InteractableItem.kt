@@ -23,7 +23,7 @@ open class InteractableItem(delegate: ItemStack) : ItemStack(delegate),
 }
 
 /**
- * Returns an ItemStack
+ * Returns a new [InteractableItem] based on this ItemStack.
  */
 fun ItemStack.interactable() = InteractableItem(this)
 
