@@ -22,5 +22,8 @@ open class InteractiveItem(delegate: ItemStack) : ItemStack(delegate),
 
 }
 
+/**
+ * Returns an ItemStack
+ */
 fun ItemStack.interactive() = InteractiveItem(this)
 

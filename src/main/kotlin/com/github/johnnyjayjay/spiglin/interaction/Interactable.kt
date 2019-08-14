@@ -4,7 +4,7 @@ import com.google.common.collect.Multimap
 import org.bukkit.event.Event
 import kotlin.reflect.KClass
 
-// TODO better file structure, docs
+
 interface Interactable<T : Interactable<T>> {
 
     val events: Multimap<KClass<out Event>, (Event) -> Unit>
