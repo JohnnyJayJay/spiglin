@@ -16,11 +16,11 @@ import org.bukkit.event.inventory.InventoryPickupItemEvent
 import org.bukkit.event.player.*
 
 /**
- * A listener used to react to [InteractiveItem] actions.
- * It must be registered as a listener to Bukkit to enable [InteractiveItem]s.
+ * A listener used to react to [InteractableItem] actions.
+ * It must be registered as a listener to Bukkit to enable [InteractableItem]s.
  * Everything apart from registering is handled internally.
  */
-object InteractiveItemListener : Listener {
+object InteractableItemListener : Listener {
 
     @EventHandler
     fun onEvent(event: Event) {
@@ -43,14 +43,14 @@ object InteractiveItemListener : Listener {
             is BlockDropItemEvent -> {
                 event.items.asSequence()
                     .map { it.itemStack }
-                    .filterIsInstance<InteractiveItem>()
+                    .filterIsInstance<InteractableItem>()
                     .forEach { it.call(event) }
                 return
             }
             else -> null
         }
 
-        if (item is InteractiveItem) {
+        if (item is InteractableItem) {
             item.call(event)
         }
     }

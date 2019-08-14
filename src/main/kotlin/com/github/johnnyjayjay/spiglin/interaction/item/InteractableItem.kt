@@ -11,11 +11,11 @@ import kotlin.reflect.KClass
  * An ItemStack with two actions attached, one for [PlayerInteractEvent]s,
  * and one for [InventoryClickEvent]s involving this item.
  *
- * @constructor Creates an [InteractiveItem] that derives from the given delegate ItemStack.
+ * @constructor Creates an [InteractableItem] that derives from the given delegate ItemStack.
  *              Changes to that ItemStack will not affect this [InteractiveItem].
  */
-open class InteractiveItem(delegate: ItemStack) : ItemStack(delegate),
-    Interactable<InteractiveItem> {
+open class InteractableItem(delegate: ItemStack) : ItemStack(delegate),
+    Interactable<InteractableItem> {
 
     override val events: Multimap<KClass<out Event>, (Event) -> Unit> =
         ArrayListMultimap.create()
@@ -25,5 +25,5 @@ open class InteractiveItem(delegate: ItemStack) : ItemStack(delegate),
 /**
  * Returns an ItemStack
  */
-fun ItemStack.interactive() = InteractiveItem(this)
+fun ItemStack.interactable() = InteractableItem(this)
 

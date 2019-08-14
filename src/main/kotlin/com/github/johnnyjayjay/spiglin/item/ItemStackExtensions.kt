@@ -1,6 +1,6 @@
 package com.github.johnnyjayjay.spiglin.item
 
-import com.github.johnnyjayjay.spiglin.interaction.item.InteractiveItem
+import com.github.johnnyjayjay.spiglin.interaction.item.InteractableItem
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
@@ -11,7 +11,7 @@ internal val NEW_LINE_SPLIT = "\n".toRegex()
  * Creates a new [ItemStack] based on the given type and applies the given body to it.
  */
 inline fun item(type: Material, interactive: Boolean = false, body: ItemStack.() -> Unit) =
-    (if (interactive) InteractiveItem(ItemStack(type)) else ItemStack(type)).apply(body)
+    (if (interactive) InteractableItem(ItemStack(type)) else ItemStack(type)).apply(body)
 
 /**
  * Creates a new [ItemStack] based on another ItemStack and applies the given body to it.
@@ -19,7 +19,7 @@ inline fun item(type: Material, interactive: Boolean = false, body: ItemStack.()
  * @param interactive Whether this item should be an instance
  */
 inline fun item(copy: ItemStack, interactive: Boolean = false, body: ItemStack.() -> Unit) =
-    (if (interactive) InteractiveItem(copy) else ItemStack(copy)).apply(body)
+    (if (interactive) InteractableItem(copy) else ItemStack(copy)).apply(body)
 
 /**
  * Assigns and accesses this ItemStack's [ItemMeta].
