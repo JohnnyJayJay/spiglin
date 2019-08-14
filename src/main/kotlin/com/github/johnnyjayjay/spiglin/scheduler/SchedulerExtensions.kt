@@ -92,7 +92,7 @@ inline fun Plugin.repeat(
     crossinline task: BukkitRunnable.(Int) -> Unit
 ): BukkitTask {
     val runnable = object : BukkitRunnable() {
-        private var iterator = progression.iterator()
+        private val iterator = progression.iterator()
 
         override fun run() {
             if (iterator.hasNext()) {

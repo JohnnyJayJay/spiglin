@@ -18,10 +18,5 @@ val onlinePlayers: Collection<Player>
  */
 fun broadcast(message: String) = Bukkit.broadcastMessage(message)
 
-inline fun <T : Event> Plugin.hear(crossinline action: (T) -> Unit) {
-    Bukkit.getPluginManager().registerEvents(object : Listener {
-        @EventHandler
-        fun onEvent(event: T) = action(event)
-    }, this)
-}
+
 
