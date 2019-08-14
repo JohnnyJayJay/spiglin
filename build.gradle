@@ -1,10 +1,12 @@
 plugins {
     id 'java'
+    id "com.jfrog.bintray" version "1.8.4"
+    id "maven-publish"
     id 'org.jetbrains.kotlin.jvm' version '1.3.41'
 }
 
 group 'com.github.johnnyjayjay'
-version '1.0-SNAPSHOT'
+version '1.0.0'
 
 sourceCompatibility = 1.8
 
@@ -15,16 +17,80 @@ repositories {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    api "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     compileOnly "org.spigotmc:spigot-api:1.14.2-R0.1-SNAPSHOT"
 }
 
-compileKotlin {
-    kotlinOptions.jvmTarget = "1.8"
-    kotlinOptions {
-        freeCompilerArgs = ["-XXLanguage:+InlineClasses"]
-    }
-}
 compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier "sources"
+    from sourceSets.main.allSource
+}
+
+javadoc.failOnError = false
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier "javadoc"
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+bintray {
+    user = System.getenv("BINTRAY_USER")
+    key = System.getenv("BINTRAY_KEY")
+    publications = ["BintrayPublication"]
+    pkg {
+        version {
+            name = version.toString()
+            released = new Date()
+        }
+        repo = "maven"
+        name = "spiglin"
+        vcsUrl = "https://github.com/johnnyjayjay/spiglin.git"
+    }
+}
+
+def pomConfig = {
+    licenses {
+        license {
+            name "GNU Lesser General Public License, Version 3"
+            url "https://www.gnu.org/licenses/lgpl-3.0.html"
+        }
+    }
+    developers {
+        developer {
+            id "johnnyjayjay"
+            email "johnnyjayjay02@gmail.com"
+        }
+    }
+    scm {
+        url "https://github.com/johnnyjayjay/spiglin"
+    }
+}
+
+publishing {
+    publications {
+        BintrayPublication(MavenPublication) {
+            from components.java
+            artifact sourcesJar
+            artifact javadocJar
+            groupId "com.github.johnnyjayjay"
+            artifactId "spiglin"
+            version version.toString()
+            pom.withXml {
+                def root = asNode()
+                root.appendNode("name", "spiglin")
+                root.appendNode("description",
+                        "A collection of Kotlin extensions and utilities for the Spigot/Bukkit framework.")
+                root.appendNode("url", "https://github.com/johnnyjayjay/spiglin/")
+                root.children().last() + pomConfig
+            }
+        }
+    }
 }

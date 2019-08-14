@@ -1,5 +1,6 @@
 package com.github.johnnyjayjay.spiglin.interaction.item
 
+import com.github.johnnyjayjay.spiglin.inventory.get
 import org.bukkit.event.Event
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
