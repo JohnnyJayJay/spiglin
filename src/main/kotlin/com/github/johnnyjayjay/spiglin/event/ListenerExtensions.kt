@@ -1,11 +1,19 @@
 package com.github.johnnyjayjay.spiglin.event
 
+import com.github.johnnyjayjay.spiglin.interaction.*
 import org.bukkit.Bukkit
+import org.bukkit.Chunk
+import org.bukkit.World
+import org.bukkit.block.Block
+import org.bukkit.entity.Entity
 import org.bukkit.event.Event
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.inventory.Inventory
+import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.Plugin
 import java.util.concurrent.TimeUnit
+import kotlin.reflect.KClass
 
 fun Plugin.register(listener: Listener) {
     Bukkit.getPluginManager().registerEvents(listener, this)
@@ -18,6 +26,26 @@ inline fun <reified T : Event> Plugin.hear(crossinline action: (T) -> Unit) {
             action(event)
         }
     })
+}
+
+fun Plugin.registerExpecter() {
+    register(EventExpecter)
+}
+
+internal val subjects = mapOf<KClass<*>, GenericSubjectListener<*>>(
+    Block::class to BlockSubjectListener,
+    Chunk::class to ChunkSubjectListener,
+    Entity::class to EntitySubjectListener,
+    Inventory::class to InventorySubjectListener,
+    ItemStack::class to ItemSubjectListener,
+    World::class to WorldSubjectListener
+)
+
+fun Plugin.registerSubjects(vararg subjectClasses: KClass<*>) {
+    subjectClasses.asSequence()
+        .map { subjects[it] }
+        .requireNoNulls()
+        .forEach { register(it) }
 }
 
 inline fun <reified T : Event> expect(
