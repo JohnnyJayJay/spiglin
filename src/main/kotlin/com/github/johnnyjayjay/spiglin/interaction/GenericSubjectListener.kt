@@ -5,7 +5,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import java.util.*
 
-abstract class InteractionListener<T> : Listener {
+abstract class GenericSubjectListener<T> : Listener {
 
     private val registry: MutableMap<T, MutableCollection<(Event) -> Unit>> = WeakHashMap()
 
@@ -35,3 +35,4 @@ abstract class InteractionListener<T> : Listener {
     protected abstract fun fromEvent(event: Event): Collection<T>;
 
 }
+

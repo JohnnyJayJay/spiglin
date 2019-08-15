@@ -3,7 +3,7 @@ package com.github.johnnyjayjay.spiglin.event
 import org.bukkit.event.Event
 
 data class ExpectedEvent<in T : Event>(
-    private val amount: Int = 0,
+    private val amount: Int = 1,
     private val predicate: (T) -> Boolean = { true },
     private val action: (T) -> Unit
 ) {
@@ -23,5 +23,9 @@ data class ExpectedEvent<in T : Event>(
                 done = true
             }
         }
+    }
+
+    companion object {
+        const val INDEFINITE_AMOUNT = 0
     }
 }

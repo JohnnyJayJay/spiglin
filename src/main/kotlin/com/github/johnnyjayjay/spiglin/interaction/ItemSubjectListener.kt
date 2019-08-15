@@ -4,13 +4,11 @@ import com.github.johnnyjayjay.spiglin.inventory.get
 import org.bukkit.event.Event
 import org.bukkit.event.block.BlockDropItemEvent
 import org.bukkit.event.enchantment.EnchantItemEvent
+import org.bukkit.event.enchantment.PrepareItemEnchantEvent
 import org.bukkit.event.entity.EntityDropItemEvent
 import org.bukkit.event.entity.EntityPickupItemEvent
 import org.bukkit.event.entity.ItemMergeEvent
-import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.event.inventory.InventoryDragEvent
-import org.bukkit.event.inventory.InventoryMoveItemEvent
-import org.bukkit.event.inventory.InventoryPickupItemEvent
+import org.bukkit.event.inventory.*
 import org.bukkit.event.player.*
 import org.bukkit.inventory.ItemStack
 
@@ -19,7 +17,7 @@ import org.bukkit.inventory.ItemStack
  * It must be registered as a listener to Bukkit to enable [InteractableItem]s.
  * Everything apart from registering is handled internally.
  */
-object ItemStackInteractionListener : InteractionListener<ItemStack>() {
+object ItemSubjectListener : GenericSubjectListener<ItemStack>() {
 
     override fun fromEvent(event: Event): Collection<ItemStack> {
         val items = mutableListOf<ItemStack?>()
@@ -39,15 +37,20 @@ object ItemStackInteractionListener : InteractionListener<ItemStack>() {
                 is EntityDropItemEvent -> add(event.itemDrop.itemStack)
                 is ItemMergeEvent -> add(event.entity.itemStack)
                 is EnchantItemEvent -> add(event.item)
+                is PrepareItemEnchantEvent -> add(event.item)
+                is PrepareAnvilEvent -> add(event.result)
+                is PrepareItemCraftEvent -> add(event.recipe?.result)
                 is InventoryClickEvent -> add(event.currentItem)
-                is InventoryDragEvent -> {
-                    add(event.cursor)
-                    add(event.oldCursor)
-                    addAll(event.newItems.values)
-                }
+                is InventoryDragEvent -> addAll(event.newItems.values)
                 is InventoryMoveItemEvent -> add(event.item)
                 is InventoryPickupItemEvent -> add(event.item.itemStack)
                 is BlockDropItemEvent -> addAll(event.items.map { it.itemStack })
+                is BrewingStandFuelEvent -> add(event.fuel)
+                is FurnaceBurnEvent -> add(event.fuel)
+                is FurnaceSmeltEvent -> {
+                    add(event.source)
+                    add(event.result)
+                }
                 else -> {}
             }
         }
@@ -57,7 +60,7 @@ object ItemStackInteractionListener : InteractionListener<ItemStack>() {
 }
 
 inline fun <reified T : Event> ItemStack.on(crossinline action: (T) -> Unit) {
-    ItemStackInteractionListener.subscribe(this) {
+    ItemSubjectListener.subscribe(this) {
         if (it is T)
             action(it)
     }
