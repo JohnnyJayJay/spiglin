@@ -35,16 +35,6 @@ object ItemSubjectListener : GenericSubjectListener<ItemStack>() {
                     add(inventory[event.previousSlot])
                     add(inventory[event.newSlot])
                 }
-                is EntityDamageByEntityEvent -> {
-                    val damager = event.damager
-                    if (damager is LivingEntity) {
-                        add(damager.equipment?.itemInHand)
-                    }
-                    val victim = event.entity
-                    if (victim is LivingEntity) {
-                        addAll(victim.equipment?.armorContents ?: emptyArray())
-                    }
-                }
                 is EntityPickupItemEvent -> add(event.item.itemStack)
                 is EntityDropItemEvent -> add(event.itemDrop.itemStack)
                 is ItemMergeEvent -> add(event.entity.itemStack)
