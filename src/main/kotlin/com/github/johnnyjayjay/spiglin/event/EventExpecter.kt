@@ -14,7 +14,7 @@ object EventExpecter : Listener {
 
     var scheduler: ScheduledExecutorService = Executors.newSingleThreadScheduledExecutor()
 
-    private val expectedEvents: Multimap<KClass<out Event>, ExpectedEvent<Nothing>> =
+    private val expectedEvents: Multimap<KClass<out Event>, ExpectedEvent<*>> =
         MultimapBuilder.hashKeys().hashSetValues().build()
 
     fun <T : Event> add(

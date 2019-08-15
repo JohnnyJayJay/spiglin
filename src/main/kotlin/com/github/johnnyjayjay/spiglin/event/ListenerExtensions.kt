@@ -23,7 +23,7 @@ inline fun <reified T : Event> Plugin.hear(crossinline action: (T) -> Unit) {
 
 fun <T : Event> expect(
     type: KClass<T>,
-    amount: Int = -1,
+    amount: Int = 0,
     predicate: (T) -> Boolean = { true },
     timeout: Long = 0,
     timeoutUnit: TimeUnit = TimeUnit.MILLISECONDS,
