@@ -12,6 +12,7 @@ import org.bukkit.event.Listener
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.Plugin
+import java.lang.IllegalArgumentException
 import java.util.concurrent.TimeUnit
 import kotlin.reflect.KClass
 
@@ -44,7 +45,7 @@ internal val subjects = mapOf<KClass<*>, GenericSubjectListener<*>>(
 fun Plugin.registerSubjects(vararg subjectClasses: KClass<*>) {
     subjectClasses.asSequence()
         .map { subjects[it] }
-        .requireNoNulls()
+        .map { it ?: throw IllegalArgumentException("Subject does not exist") }
         .forEach { register(it) }
 }
 
