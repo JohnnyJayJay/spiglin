@@ -122,6 +122,11 @@ expect<PlayerMoveEvent>(
 )
 ```
 
+Note that you have to register the `EventExpecter` as a listener once:
+```kotlin
+plugin.registerExpecter()
+```
+
 #### Subject specific listeners
 With spiglin, several different types of object are considered to be "event subjects":
 
@@ -142,6 +147,11 @@ block.on<BlockBreakEvent> {
 }
 ```
 The code within the {} will only be called if this specific block is broken.
+
+Note that you have to register the subjects you want to use once somewhere in your plugin:
+```kotlin
+plugin.registerSubjects(ItemStack::class, Inventory::class) // varargs
+```
 
 **Note that spiglin's list of subject related events is incomplete and does not
  derive from any Bukkit API,  i.e. some events may not work (as expected).**
