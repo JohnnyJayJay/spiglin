@@ -2,7 +2,7 @@ package com.github.johnnyjayjay.spiglin.event
 
 import org.bukkit.event.Event
 
-data class ExpectedEvent<in T : Event>(
+data class Expectation<in T : Event>(
     private val amount: Int = 1,
     private val predicate: (T) -> Boolean = { true },
     private val action: (T) -> Unit

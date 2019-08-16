@@ -56,8 +56,8 @@ inline fun <reified T : Event> expect(
     timeoutUnit: TimeUnit = TimeUnit.MILLISECONDS,
     noinline timeoutAction: () -> Unit = {},
     noinline action: (T) -> Unit
-): ExpectedEvent<T> {
-    val expectation = ExpectedEvent(amount, predicate, action)
+): Expectation<T> {
+    val expectation = Expectation(amount, predicate, action)
     EventExpecter.add(T::class, expectation, timeout, timeoutUnit, timeoutAction)
     return expectation
 }

@@ -8,6 +8,7 @@ import org.bukkit.event.player.PlayerEvent
 import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.event.vehicle.VehicleEvent
 
+// TODO add block events
 object EntitySubjectListener : GenericSubjectListener<Entity>() {
 
     override fun fromEvent(event: Event): Collection<Entity> {

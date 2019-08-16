@@ -14,12 +14,12 @@ object EventExpecter : Listener {
 
     var scheduler: ScheduledExecutorService = Executors.newSingleThreadScheduledExecutor()
 
-    private val expectedEvents: Multimap<KClass<out Event>, ExpectedEvent<*>> =
+    private val expectedEvents: Multimap<KClass<out Event>, Expectation<*>> =
         MultimapBuilder.hashKeys().hashSetValues().build()
 
     fun <T : Event> add(
         type: KClass<T>,
-        expectation: ExpectedEvent<T>,
+        expectation: Expectation<T>,
         timeout: Long = 0,
         timeoutUnit: TimeUnit = TimeUnit.MILLISECONDS,
         timeoutAction: () -> Unit = {}
@@ -39,7 +39,7 @@ object EventExpecter : Listener {
         }
     }
 
-    fun <T : Event> remove(type: KClass<T>, expectation: ExpectedEvent<T>) {
+    fun <T : Event> remove(type: KClass<T>, expectation: Expectation<T>) {
         synchronized(this) {
             expectedEvents.remove(type, expectation)
             expectation.done = true
@@ -49,7 +49,7 @@ object EventExpecter : Listener {
     @EventHandler
     fun onEvent(event: Event) {
         expectedEvents[event.javaClass.kotlin].forEach {
-            (it as ExpectedEvent<Event>).call(event)
+            (it as Expectation<Event>).call(event)
             if (it.done) {
                 remove(event.javaClass.kotlin, it)
             }

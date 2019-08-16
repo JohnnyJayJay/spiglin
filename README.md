@@ -10,6 +10,7 @@ The following components of the Bukkit API are covered and extended by this coll
 
 - `ItemStack`
 - `Inventory`
+- `Listener & Event`
 - `Player`
 - `Vector & Location`
 
@@ -58,7 +59,7 @@ player.inventory += button // adds the item to the player's inventory
 This action will be executed if a PlayerInteractEvent involves this item.
 
 ### Inventories
-The inventory EDSL works similar to the ItemStack EDSL and is fully compatible with it.
+(Chest) Inventory creation:
 ```kotlin
 val inventory: Inventory = inventory(rows = 3, title = "Click the button") {
     // you can assign the contents directly or use the get/set operators
@@ -66,7 +67,6 @@ val inventory: Inventory = inventory(rows = 3, title = "Click the button") {
     this[all except slot(1, 4)] = borderItem // fills every slot with the provided item, excluding the ones speficied in "except" (also works with linear Iterable<Int>)
 }
 ```
-Note that the only supported inventory type is `InventoryType.CHEST`!
 
 There are several other utility functions:
 ```kotlin
@@ -93,6 +93,61 @@ linear indices, like so:
 ```kotlin
 val item: ItemStack? = inventory[23]
 ```
+
+### Listeners & Events
+Spiglin introduces 3 new and convenient ways to listen for events.
+
+#### Ad hoc listeners
+This allows you to listen to listen for events via generics and without making a 
+listener class and method yourself.
+
+Here's a simple listener that logs messages written to chat:
+```kotlin
+plugin.hear<AsyncPlayerChatEvent> {
+    logger.log("Player ${it.player.name} sent a message in chat: ${it.message}")
+}
+```
+
+#### Expectations
+Expectations allow you to "wait" for specific events that meet specific conditions.
+They unregister themselves once the expectation is fulfilled or timed out.
+
+Here's a piece of code that teleports a player to a location provided that they don't move:
+```kotlin
+expect<PlayerMoveEvent>(
+    timeout = 5,
+    timeoutUnit = TimeUnit.SECONDS,
+    timeoutAction = { player.teleport(location) },   
+    action = { player.sendMessage("You moved!") }   
+)
+```
+
+#### Subject specific listeners
+With spiglin, several different types of object are considered to be "event subjects":
+
+- `Block`
+- `Chunk`
+- `Entity`
+- `Inventory`
+- `ItemStack`
+- `World`
+
+You can attach subject specific listeners to instances of these types that will only be 
+called if the event involves this instance.
+
+For instance, take a look at this:
+```kotlin
+block.on<BlockBreakEvent> {
+    it.player?.sendMessage("You broke it :'(")
+}
+```
+The code within the {} will only be called if this specific block is broken.
+
+**Note that spiglin's list of subject related events is incomplete and does not
+ derive from any Bukkit API,  i.e. some events may not work (as expected).**
+ 
+ **Feel free to expand the list of supported events for this feature.**
+
 
 ### Schedulers
 In the `scheduler` package, you can find convenient wrappers and extensions for the 
@@ -122,6 +177,12 @@ player.hideFrom(otherPlayer) // hides this player from the provided player. Also
 player.hideIf { !it.hasPermission("see") } // hides this player from all players matching the given predicate
 player.hideFromAll() // Makes this player invisible for all players
 player.play(effect = Effect.ANVIL_BREAK) // various utility functions with default parameters for #playSound, #playNote and #playEffect
+```
+
+### General
+```kotlin
+val players: Collection<Player> = onlinePlayers // shortcut for Bukkit.getOnlinePlayers()
+broadcast("Hello, Minecraft!") // shortcut for Bukkit.broadcastMessage(String)
 ```
 
 ### Vector & Location
