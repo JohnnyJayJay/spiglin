@@ -42,22 +42,6 @@ I highly discourage you from using it. You will most likely get runtime errors.
 
 If you are uncertain, check out the documentation for the individual methods and variables.
 
-### Interactive Items
-Spiglin provides a special kind of `ItemStack` called `InteractiveItem`. It is used to attach 
-actions to `ItemStack`s that are executed on specific events that involve this `ItemStack`.
-To get an interactive version of an `ItemStack`, you can call `ItemStack#toInteractiveItem()` 
-or `interactive(ItemStack)`.
-
-Attaching an action to an `InteractiveItem` works like this:
-```kotlin
-val button = interactive(item) // creates a new, interactive version of the item
-    .attach(PlayerInteractEvent::class) { // attaches an action
-        it.player.kill() 
-    } 
-player.inventory += button // adds the item to the player's inventory
-```
-This action will be executed if a PlayerInteractEvent involves this item.
-
 ### Inventories
 (Chest) Inventory creation:
 ```kotlin
