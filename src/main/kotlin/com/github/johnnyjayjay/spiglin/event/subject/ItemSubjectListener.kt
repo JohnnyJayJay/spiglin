@@ -1,12 +1,10 @@
-package com.github.johnnyjayjay.spiglin.interaction
+package com.github.johnnyjayjay.spiglin.event.subject
 
 import com.github.johnnyjayjay.spiglin.inventory.get
-import org.bukkit.entity.LivingEntity
 import org.bukkit.event.Event
 import org.bukkit.event.block.BlockDropItemEvent
 import org.bukkit.event.enchantment.EnchantItemEvent
 import org.bukkit.event.enchantment.PrepareItemEnchantEvent
-import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDropItemEvent
 import org.bukkit.event.entity.EntityPickupItemEvent
 import org.bukkit.event.entity.ItemMergeEvent

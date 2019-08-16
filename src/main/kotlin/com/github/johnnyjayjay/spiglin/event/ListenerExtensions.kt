@@ -1,6 +1,6 @@
 package com.github.johnnyjayjay.spiglin.event
 
-import com.github.johnnyjayjay.spiglin.interaction.*
+import com.github.johnnyjayjay.spiglin.event.subject.*
 import org.bukkit.Bukkit
 import org.bukkit.Chunk
 import org.bukkit.World

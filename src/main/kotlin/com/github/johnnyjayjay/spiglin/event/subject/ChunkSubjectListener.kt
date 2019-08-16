@@ -1,4 +1,4 @@
-package com.github.johnnyjayjay.spiglin.interaction
+package com.github.johnnyjayjay.spiglin.event.subject
 
 import org.bukkit.Chunk
 import org.bukkit.event.Event

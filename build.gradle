@@ -76,7 +76,7 @@ def pomConfig = {
 
 publishing {
     publications {
-        BintrayPublication(MavenPublication) {
+        Spiglin(MavenPublication) {
             from components.java
             artifact sourcesJar
             artifact javadocJar
