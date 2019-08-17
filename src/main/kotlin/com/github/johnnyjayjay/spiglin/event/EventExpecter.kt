@@ -27,8 +27,10 @@ object EventExpecter : Listener {
         expectedEvents.put(type, expectation)
         if (timeout > 0) {
             scheduler.schedule({
-                timeoutAction()
-                remove(type, expectation)
+                if (!expectation.done) {
+                    timeoutAction()
+                    remove(type, expectation)
+                }
             }, timeout, timeoutUnit)
         }
     }
