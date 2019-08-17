@@ -9,7 +9,7 @@ internal val NEW_LINE_SPLIT = "\n".toRegex()
 /**
  * Creates a new [ItemStack] based on the given type and applies the given body to it.
  */
-inline fun item(type: Material, interactive: Boolean = false, body: ItemStack.() -> Unit) =
+inline fun item(type: Material, body: ItemStack.() -> Unit) =
     ItemStack(type).apply(body)
 
 /**

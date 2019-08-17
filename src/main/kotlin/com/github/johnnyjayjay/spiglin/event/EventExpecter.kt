@@ -49,6 +49,7 @@ object EventExpecter : Listener {
     @EventHandler
     fun onEvent(event: Event) {
         expectedEvents[event.javaClass.kotlin].forEach {
+            @Suppress("UNCHECKED_CAST")
             (it as Expectation<Event>).call(event)
             if (it.done) {
                 remove(event.javaClass.kotlin, it)

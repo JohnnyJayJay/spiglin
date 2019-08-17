@@ -10,6 +10,7 @@ fun Damageable.kill() {
 }
 
 /** Sets this Damageable's health to maxHealth. */
+@Suppress("DEPRECATION")
 fun Damageable.heal() {
     health = maxHealth
 }
@@ -20,10 +21,12 @@ fun Player.feed() {
 }
 
 /** Hides this player from the given players.*/
+@Suppress("DEPRECATION")
 fun Player.hideFrom(vararg players: Player) =
     players.forEach { it.hidePlayer(this) }
 
 /** Hides this player from the given players. */
+@Suppress("DEPRECATION")
 fun Player.hideFrom(players: Iterable<Player>) =
     players.forEach { it.hidePlayer(this) }
 

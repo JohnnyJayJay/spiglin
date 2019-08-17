@@ -55,7 +55,7 @@ inline fun ItemMeta.attributes(body: Attributes.() -> Unit) {
     val attributes = Attributes().apply(body)
     val modifiers = attributes.modifiers
     attributeModifiers = ArrayListMultimap.create(
-        if (attributeModifiers == null) ArrayListMultimap.create() else attributeModifiers
+        if (attributeModifiers == null) ArrayListMultimap.create() else attributeModifiers!!
     ).also { it.putAll(modifiers) }
 }
 
