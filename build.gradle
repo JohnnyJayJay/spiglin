@@ -44,7 +44,7 @@ artifacts {
 bintray {
     user = System.getenv("BINTRAY_USER")
     key = System.getenv("BINTRAY_KEY")
-    publications = ["BintrayPublication"]
+    publications = ["Spiglin"]
     pkg {
         version {
             name = version.toString()

@@ -149,14 +149,14 @@ In the `scheduler` package, you can find convenient wrappers and extensions for 
 scheduler actions available in Bukkit.
 ```kotlin
 // .runTask
-run(plugin = plugin) { } 
+plugin.run { } 
 // .runTaskLater
-delay(ticks = 20 * 5, plugin = plugin) { } 
+plugin.delay(ticks = 20 * 5) { } 
 // .runTaskTimer
-schedule(delay = 20, period = 20 * 5, plugin = plugin) {} 
+plugin.schedule(delay = 20, period = 20 * 5) {} 
 
 // repeat from the beginning to the end of the provided progression
-repeat(progression = 1..5, delay = 20, period = 20 * 5, plugin = plugin) { current ->
+plugin.repeat(progression = 1..5, delay = 20, period = 20 * 5) { current ->
     
 }
 ```
