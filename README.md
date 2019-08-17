@@ -2,6 +2,9 @@
 Spiglin is a collection of [Kotlin](https://kotlinlang.org/) extensions and utilities 
 for the Minecraft server software [Spigot/Bukkit](https://www.spigotmc.org/).
 
+## Dependency
+https://bintray.com/johnnyjayjay/spiglin/spiglin
+
 ## Features
 Spiglin provides several different components that improve certain parts of interacting 
 with Bukkit's API, including two very small EDSLs (Embedded Domain Specific Language).

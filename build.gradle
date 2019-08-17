@@ -47,13 +47,14 @@ bintray {
     publications = ["Spiglin"]
     pkg {
         version {
-            name = version.toString()
+            name = "1.0.0"
             released = new Date()
         }
-        repo = "maven"
+        repo = "spiglin"
         name = "spiglin"
         vcsUrl = "https://github.com/johnnyjayjay/spiglin.git"
     }
+    publish = true
 }
 
 def pomConfig = {
