@@ -27,7 +27,7 @@ object EventExpecter : Listener {
         expectedEvents.put(type, expectation)
         if (timeout > 0) {
             scheduler.schedule({
-                if (!expectation.done) {
+                if (!expectation.fulfilled) {
                     timeoutAction()
                     remove(type, expectation)
                 }
@@ -37,14 +37,14 @@ object EventExpecter : Listener {
 
     fun <T : Event> removeAll(type: KClass<T>) {
         synchronized(this) {
-            expectedEvents.removeAll(type).forEach { it.done = true }
+            expectedEvents.removeAll(type).forEach { it.fulfilled = true }
         }
     }
 
     fun <T : Event> remove(type: KClass<T>, expectation: Expectation<T>) {
         synchronized(this) {
             expectedEvents.remove(type, expectation)
-            expectation.done = true
+            expectation.fulfilled = true
         }
     }
 
@@ -53,7 +53,7 @@ object EventExpecter : Listener {
         expectedEvents[event.javaClass.kotlin].forEach {
             @Suppress("UNCHECKED_CAST")
             (it as Expectation<Event>).call(event)
-            if (it.done) {
+            if (it.fulfilled) {
                 remove(event.javaClass.kotlin, it)
             }
         }
