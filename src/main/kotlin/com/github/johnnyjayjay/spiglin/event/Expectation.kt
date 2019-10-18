@@ -9,7 +9,7 @@ data class Expectation<in T : Event>(
 ) {
 
     var fulfilled: Boolean = false
-        internal set
+        private set
 
     private var callCount = 0
 
@@ -30,6 +30,6 @@ data class Expectation<in T : Event>(
     }
 
     companion object {
-        const val INDEFINITE_AMOUNT = 0
+        const val INDEFINITE_AMOUNT = 0L
     }
 }

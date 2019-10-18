@@ -101,7 +101,7 @@ They unregister themselves once the expectation is fulfilled or timed out.
 
 Here's a piece of code that teleports a player to a location provided that they don't move:
 ```kotlin
-expect<PlayerMoveEvent>(
+plugin.expect<PlayerMoveEvent>(
     predicate = { it.player == player },
     timeout = 5,
     timeoutUnit = TimeUnit.SECONDS,
