@@ -27,7 +27,7 @@ val item: ItemStack = item(Material.GRASS_BLOCK) {
         with(Enchantment.FIRE_ASPECT) level 3 // adds fire aspect 3 as an enchantment
     }
     meta { // meta {} also has a type parameter that lets you work with more specific ItemMetas.
-        displayName = "Grass block of doom"
+        name = "Grass block of doom"
         stringLore = "A very\npowerful weapon" // instead of Lists, normal Strings can be used with stringLore. This just delegates to the normal lore.
         unbreakable = true
         flag(ItemFlag.HIDE_UNBREAKABLE)
