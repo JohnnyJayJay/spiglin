@@ -97,7 +97,7 @@ plugin.hear<AsyncPlayerChatEvent> {
 
 #### Expectations
 Expectations allow you to "wait" for specific events that meet specific conditions.
-They unregister themselves once the expectation is fulfilled or timed out.
+They unregister themselves once the expectation is met or timed out.
 
 Here's a piece of code that teleports a player to a location, provided that they don't move:
 ```kotlin
