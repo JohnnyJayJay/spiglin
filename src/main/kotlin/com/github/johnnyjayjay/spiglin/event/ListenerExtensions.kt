@@ -1,36 +1,35 @@
 package com.github.johnnyjayjay.spiglin.event
 
+import com.github.johnnyjayjay.spiglin.PluginManager
 import com.github.johnnyjayjay.spiglin.event.subject.*
-import org.bukkit.Bukkit
+import org.apache.commons.lang.Validate
 import org.bukkit.Chunk
 import org.bukkit.World
 import org.bukkit.block.Block
 import org.bukkit.entity.Entity
-import org.bukkit.event.Event
-import org.bukkit.event.EventHandler
-import org.bukkit.event.Listener
+import org.bukkit.event.*
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.Plugin
-import java.lang.IllegalArgumentException
+import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import kotlin.reflect.KClass
 
-fun Plugin.register(listener: Listener) {
-    Bukkit.getPluginManager().registerEvents(listener, this)
+inline fun <reified T : Event> Plugin.hear(
+    priority: EventPriority = EventPriority.NORMAL,
+    ignoreCancelled: Boolean = false,
+    noinline action: Listener.(T) -> Unit
+): Listener {
+    return ListenerGenerator.generateListener(T::class, action, priority, ignoreCancelled)
+        .also { it.register(this) }
 }
 
-inline fun <reified T : Event> Plugin.hear(crossinline action: (T) -> Unit) {
-    register(object : Listener {
-        @EventHandler
-        fun onEvent(event: T) {
-            action(event)
-        }
-    })
+fun Listener.register(plugin: Plugin) {
+    PluginManager.registerEvents(this, plugin)
 }
 
-fun Plugin.registerExpecter() {
-    register(EventExpecter)
+fun Listener.unregister() {
+    HandlerList.unregisterAll(this)
 }
 
 internal val subjects = mapOf<KClass<*>, GenericSubjectListener<*>>(
@@ -46,10 +45,16 @@ fun Plugin.registerSubjects(vararg subjectClasses: KClass<*>) {
     subjectClasses.asSequence()
         .map { subjects[it] }
         .map { it ?: throw IllegalArgumentException("Subject does not exist") }
-        .forEach { register(it) }
+        .forEach { it.register(this) }
 }
 
-inline fun <reified T : Event> expect(
+var expectationPool = Executors.newSingleThreadScheduledExecutor()
+    set(value) {
+        Validate.isTrue(!value.isShutdown, "ScheduledExecutorService must not be shut down")
+        field = value
+    }
+
+inline fun <reified T : Event> Plugin.expect(
     amount: Int = 1,
     noinline predicate: (T) -> Boolean = { true },
     timeout: Long = 0,
@@ -58,7 +63,20 @@ inline fun <reified T : Event> expect(
     noinline action: (T) -> Unit
 ): Expectation<T> {
     val expectation = Expectation(amount, predicate, action)
-    EventExpecter.add(T::class, expectation, timeout, timeoutUnit, timeoutAction)
+    val listener = hear<T> {
+        expectation.call(it)
+        if (expectation.fulfilled) {
+            unregister()
+        }
+    }
+    if (timeout > 0) {
+        expectationPool.schedule({
+            if (!expectation.fulfilled) {
+                timeoutAction()
+                listener.unregister()
+            }
+        }, timeout, timeoutUnit)
+    }
     return expectation
 }
 

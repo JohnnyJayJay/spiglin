@@ -7,6 +7,7 @@ data class Expectation<in T : Event>(
     private val predicate: (T) -> Boolean = { true },
     private val action: (T) -> Unit
 ) {
+
     var fulfilled: Boolean = false
         internal set
 
@@ -22,6 +23,10 @@ data class Expectation<in T : Event>(
                 fulfilled = true
             }
         }
+    }
+
+    fun cancel() {
+        fulfilled = true
     }
 
     companion object {

@@ -26,7 +26,7 @@ inline fun inventory(
     owner: InventoryHolder? = null,
     title: String = InventoryType.CHEST.defaultTitle,
     body: Inventory.() -> Unit
-) = Bukkit.createInventory(owner, rows, title).apply(body)
+) = Bukkit.createInventory(owner, 9 * rows, title).apply(body)
 
 /**
  * Iterates over the slots in this inventory. Other than [Inventory.forEach] or [Inventory.forEachIndexed]
