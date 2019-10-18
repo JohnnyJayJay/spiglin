@@ -26,7 +26,7 @@ inline fun inventory(
     owner: InventoryHolder? = null,
     title: String = InventoryType.CHEST.defaultTitle,
     body: Inventory.() -> Unit
-) = Bukkit.createInventory(owner, 9 * rows, title).apply(body)
+) = Bukkit.createInventory(owner, ROW_SIZE * rows, title).apply(body)
 
 /**
  * Iterates over the slots in this inventory. Other than [Inventory.forEach] or [Inventory.forEachIndexed]
@@ -227,7 +227,7 @@ fun Inventory.borders(padding: Int = 0): Iterable<Int> {
  * An [Iterable] containing the linear slot indices of the corners of this inventory.
  */
 val Inventory.corners: Iterable<Int>
-    get() = slots(0 to 0, 0 to 8, lastRowIndex to 0, lastRowIndex to 8)
+    get() = slots(0 to 0, 0 to ROW_SIZE - 1, lastRowIndex to 0, lastRowIndex to ROW_SIZE - 1)
 
 /**
  * The index of the last row of this inventory, in a two-dimensional context.
