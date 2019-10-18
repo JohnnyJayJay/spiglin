@@ -5,6 +5,7 @@ import org.apache.commons.lang.Validate
 import org.bukkit.event.Event
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
+import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockDropItemEvent
 import org.bukkit.event.block.BlockEvent
 import org.bukkit.event.enchantment.EnchantItemEvent
@@ -56,30 +57,11 @@ object RetrieverMap {
         add(BlockDropItemEvent::class) { listOf(it.items.map { it.itemStack }) }
         add(BrewingStandFuelEvent::class) { listOf(it.fuel) }
         add(FurnaceBurnEvent::class) { listOf(it.fuel) }
-        add(FurnaceSmeltEvent::class) {
-            listOf(
-                it.result,
-                it.source
-            )
-        }
-        add(PlayerInteractEntityEvent::class) {
-            listOf(
-                it.player,
-                it.rightClicked
-            )
-        }
-        add(EntityDamageByEntityEvent::class) {
-            listOf(
-                it.damager,
-                it.entity
-            )
-        }
-        add(EntityDamageByBlockEvent::class) {
-            listOf(
-                it.entity,
-                it.damager
-            )
-        }
+        add(FurnaceSmeltEvent::class) { listOf(it.result, it.source) }
+        add(BlockBreakEvent::class) { listOf(it.block, it.player) }
+        add(PlayerInteractEntityEvent::class) { listOf(it.player, it.rightClicked) }
+        add(EntityDamageByEntityEvent::class) { listOf(it.damager, it.entity) }
+        add(EntityDamageByBlockEvent::class) { listOf(it.entity, it.damager) }
         add(EntityDamageEvent::class) { listOf(it.entity) }
         add(BlockEvent::class) { listOf(it.block) }
         add(PlayerEvent::class) { listOf(it.player) }

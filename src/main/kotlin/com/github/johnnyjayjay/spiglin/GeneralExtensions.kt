@@ -16,6 +16,12 @@ val onlinePlayers: Collection<Player>
  */
 fun broadcast(message: String) = Bukkit.broadcastMessage(message)
 
+/**
+ * A singleton that delegates to [Bukkit.getServer]
+ */
 object Server : Server by Bukkit.getServer()
 
+/**
+ * A singleton that delegates to [Bukkit.getPluginManager]
+ */
 object PluginManager : PluginManager by Bukkit.getPluginManager()

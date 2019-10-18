@@ -99,7 +99,7 @@ plugin.hear<AsyncPlayerChatEvent> {
 Expectations allow you to "wait" for specific events that meet specific conditions.
 They unregister themselves once the expectation is fulfilled or timed out.
 
-Here's a piece of code that teleports a player to a location provided that they don't move:
+Here's a piece of code that teleports a player to a location, provided that they don't move:
 ```kotlin
 plugin.expect<PlayerMoveEvent>(
     predicate = { it.player == player },
@@ -108,11 +108,6 @@ plugin.expect<PlayerMoveEvent>(
     timeoutAction = { player.teleport(location) },   
     action = { player.sendMessage("You moved!") }   
 )
-```
-
-Note that you have to register the `EventExpecter` as a listener once:
-```kotlin
-plugin.registerExpecter()
 ```
 
 #### Subject specific listeners
@@ -131,20 +126,15 @@ called if the event involves this instance.
 For instance, take a look at this:
 ```kotlin
 block.on<BlockBreakEvent> {
-    it.player?.sendMessage("You broke it :'(")
+    it.player.sendMessage("You broke it :'(")
 }
 ```
 The code within the {} will only be called if this specific block is broken.
 
-Note that you have to register the subjects you want to use once somewhere in your plugin:
-```kotlin
-plugin.registerSubjects(ItemStack::class, Inventory::class) // varargs
-```
-
-**Note that spiglin's list of subject related events is incomplete and does not
- derive from any Bukkit API,  i.e. some events may not work (as expected).**
+**Note that spiglin's list of subject related events is not guaranteed to be complete and does not
+ derive from any Bukkit API,  i.e. some events may not work as expected.**
  
- **Feel free to expand the list of supported events for this feature.**
+ **Feel free to expand the list of supported events for this feature. by submitting a Pull Request.**
 
 
 ### Schedulers
@@ -164,7 +154,7 @@ plugin.repeat(progression = 1..5, delay = 20, period = 20 * 5) { current ->
 }
 ```
 All of these functions also have an `async` parameter that can be used to 
-use them asynchronously.
+run them asynchronously.
 
 ### Player
 ```kotlin
@@ -181,6 +171,8 @@ player.play(effect = Effect.ANVIL_BREAK) // various utility functions with defau
 ```kotlin
 val players: Collection<Player> = onlinePlayers // shortcut for Bukkit.getOnlinePlayers()
 broadcast("Hello, Minecraft!") // shortcut for Bukkit.broadcastMessage(String)
+PluginManager.clearPlugins() // shortcut for Bukkit.getPluginManager()
+Server.shutdown() // shortcut for Bukkit.getServer()
 ```
 
 ### Vector & Location
