@@ -16,7 +16,7 @@ operator fun Location.plusAssign(vector: Vector) {
 operator fun Location.minus(vector: Vector) =
     clone().subtract(vector)
 
-/** Removes the given vector from this location */
+/** Subtracts the given vector from this location */
 operator fun Location.minusAssign(vector: Vector) {
     subtract(vector)
 }

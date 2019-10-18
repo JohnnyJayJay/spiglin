@@ -105,7 +105,7 @@ var expectationPool: ScheduledExecutorService = Executors.newSingleThreadSchedul
  *
  * If the expectation is met or if it times out, the listener is unregistered automatically.
  *
- * @param amount The amount of expected events
+ * @param amount The amount of expected events; use 0 for an indefinite amount
  * @param predicate A function determining whether an event should be accepted or not
  * @param timeout A timeout after which, should this expectation not have been met,
  * the listener is unregistered and the timeoutAction is run.
@@ -113,7 +113,7 @@ var expectationPool: ScheduledExecutorService = Executors.newSingleThreadSchedul
  * @param timeoutAction The action to run if the expectation times out
  * @param action The action to run for each event that meets the expectation
  *
- * @return
+ * @return The listener created by this function.
  */
 inline fun <reified T : Event> Plugin.expect(
     amount: Int = 1,
