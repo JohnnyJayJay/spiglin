@@ -15,27 +15,27 @@ interface ExtendedListener<in T : Event> : Listener {
     fun onEvent(event: T)
 }
 
+inline fun <reified T : Event> listener(
+    crossinline action: Listener.(T) -> Unit
+) = object : ExtendedListener<T> {
+    override fun onEvent(event: T) {
+        action(event)
+    }
+}
+
 inline fun <reified T : Event> Plugin.hear(
     priority: EventPriority = EventPriority.NORMAL,
     ignoreCancelled: Boolean = false,
     crossinline action: Listener.(T) -> Unit
-): Listener {
-    return object : ExtendedListener<T> {
-        override fun onEvent(event: T) {
-            action(event)
-        }
-    }.also { it.register(this, priority, ignoreCancelled) }
-}
+) = listener(action).also { it.register(this, priority, ignoreCancelled) }
 
 @Suppress("UNCHECKED_CAST")
 inline fun <reified T : Event> ExtendedListener<T>.register(
     plugin: Plugin,
     priority: EventPriority = EventPriority.NORMAL,
     ignoreCancelled: Boolean = false
-) {
-    register<T>(plugin, priority, ignoreCancelled) { listener, event ->
-        (listener as ExtendedListener<T>).onEvent(event as T)
-    }
+) = register<T>(plugin, priority, ignoreCancelled) { listener, event ->
+    (listener as ExtendedListener<T>).onEvent(event as T)
 }
 
 inline fun <reified T : Event> Listener.register(
@@ -43,17 +43,11 @@ inline fun <reified T : Event> Listener.register(
     priority: EventPriority = EventPriority.NORMAL,
     ignoreCancelled: Boolean = false,
     noinline eventExecutor: (Listener, Event) -> Unit
-) {
-    PluginManager.registerEvent(T::class.java, this, priority, eventExecutor, plugin, ignoreCancelled)
-}
+) = PluginManager.registerEvent(T::class.java, this, priority, eventExecutor, plugin, ignoreCancelled)
 
-fun Listener.register(plugin: Plugin) {
-    PluginManager.registerEvents(this, plugin)
-}
+fun Listener.register(plugin: Plugin) = PluginManager.registerEvents(this, plugin)
 
-fun Listener.unregister() {
-    HandlerList.unregisterAll(this)
-}
+fun Listener.unregister() = HandlerList.unregisterAll(this)
 
 var expectationPool: ScheduledExecutorService = Executors.newSingleThreadScheduledExecutor()
     set(value) {
