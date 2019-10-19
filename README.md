@@ -11,11 +11,13 @@ with Bukkit's API, including two very small EDSLs (Embedded Domain Specific Lang
 
 The following components of the Bukkit API are covered and extended by this collection:
 
-- `ItemStack`
-- `Inventory`
-- `Listener & Event`
-- `Player`
-- `Vector & Location`
+- Items
+- Inventories
+- Commands
+- Listeners
+- Scheduler
+- Player
+- Vector & Location
 
 ### Items
 This EDSL makes the creation of custom items very simple and concise. 
@@ -81,7 +83,39 @@ linear indices, like so:
 val item: ItemStack? = inventory[23]
 ```
 
-### Listeners & Events
+### Commands
+Spiglin provides an implementation of `CommandExecutor` in its main package, `DelegatingCommand`, 
+which can be used to create tree-like command structures. 
+
+For example, take a warn system with the following commands:
+- warn list <Player>; lists all warns a player has received
+- warn add <Player> <Reason>; warns a player for some reason
+- warn remove <Player> <ID>; Removes a warn with a specific ID from the player
+- warn clear <Player>; Clears all warns of a player
+- warn; Displays warn statistics/a help message/whatever
+
+Done within a single command "warn", the best you can do is a switch statement that checks
+if the first argument matches any child command of `warn`.
+
+With `DelegatingCommand`, you can separate the different commands and bundle them conveniently 
+in a single instance of the class:
+
+```kotlin
+DelegatingCommand(
+    default = WarnHelpCommand, 
+    children = mapOf(
+        "list" to WarnListCommand, "add" to WarnAddCommand, 
+        "remove" to WarnRemoveCommand, "clear" to WarnClearCommand
+    )
+)
+```
+
+The children themselves can also be `DelegatingCommand`s of course. 
+
+When an instance of `DelegatingCommand` delegates to a child, 
+the previously first argument is dropped and the label is changed to the child label.
+
+### Listeners
 Spiglin introduces 3 new and convenient ways to listen for events.
 
 #### Ad hoc listeners
@@ -135,7 +169,6 @@ The code within the {} will only be called if this specific block is broken.
  derive from any Bukkit API,  i.e. some events may not work as expected.**
  
  **Feel free to expand the list of supported events for this feature. by submitting a Pull Request.**
-
 
 ### Schedulers
 In the `scheduler` package, you can find convenient wrappers and extensions for the 

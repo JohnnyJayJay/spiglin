@@ -21,7 +21,7 @@ class DelegatingCommand(
         if (args.isNotEmpty()) {
             val childLabel = args[0]
             if (childLabel in children) {
-                return children[childLabel]!!.onCommand(sender, command, label, args.copyOfRange(1, args.size))
+                return children[childLabel]!!.onCommand(sender, command, args[0], args.copyOfRange(1, args.size))
             }
         }
         return default.onCommand(sender, command, label, args)
