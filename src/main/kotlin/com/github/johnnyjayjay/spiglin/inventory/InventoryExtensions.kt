@@ -79,7 +79,7 @@ operator fun Inventory.get(index: Int): ItemStack? = contents[index]
  * @see slot
  */
 operator fun Inventory.set(index: Int, item: ItemStack?) {
-    contents[index] = item
+    this.setItem(index, item)
 }
 
 /**
@@ -199,7 +199,7 @@ fun Inventory.row(index: Int): IntRange {
 fun Inventory.column(index: Int): IntProgression {
     checkBounds(index, 0 until 9, "Column")
     val start = slot(0, index)
-    return start until (rows - 1 + index) step 9
+    return start until (lastRowIndex * ROW_SIZE + index + 1) step 9
 }
 
 /**
