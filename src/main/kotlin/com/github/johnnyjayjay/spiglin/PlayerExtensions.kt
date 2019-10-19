@@ -31,9 +31,9 @@ fun Player.hideFrom(players: Iterable<Player>) =
     players.forEach { it.hidePlayer(this) }
 
 /** Hides this player from all [onlinePlayers] that match the given predicate. */
-inline fun Player.hideIf(crossinline predicate: (Player) -> Boolean) {
+fun Player.hideIf(predicate: (Player) -> Boolean) {
     onlinePlayers.asSequence()
-        .filter { predicate(it) }
+        .filter(predicate)
         .forEach { this.hideFrom(it) }
 }
 
