@@ -26,6 +26,3 @@ fun <T> T.asConstantMetadata(plugin: Plugin) =
 
 fun <T> T.asVariableMetadata(plugin: Plugin) =
     VariableMetadata(this, plugin)
-
-inline fun <reified T> Player.firstMetadata(key: String) =
-    this.getMetadata(key).firstOrNull()?.let { it.value() as T }
