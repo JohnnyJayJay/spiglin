@@ -29,14 +29,22 @@ var ItemMeta.stringLore: String?
         lore = value?.split(NEW_LINE_SPLIT)
     }
 
-var ItemMeta.displayName: String?
-    get() = displayName
+/**
+ * @see ItemMeta.getDisplayName
+ * @see ItemMeta.setDisplayName
+ */
+var ItemMeta.name: String?
+    get() = if (hasDisplayName()) displayName else null
     set(value) {
         setDisplayName(value)
     }
 
-var ItemMeta.customModelData: Int?
-    get() = customModelData
+/**
+ * @see ItemMeta.getCustomModelData
+ * @see ItemMeta.setCustomModelData
+ */
+var ItemMeta.modelData: Int?
+    get() = if (hasCustomModelData()) customModelData else null
     set(value) {
         setCustomModelData(value)
     }

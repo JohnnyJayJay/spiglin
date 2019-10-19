@@ -32,7 +32,7 @@ fun slot(slot: Slot) =
  */
 fun slot(row: Int, column: Int): Int {
     Validate.isTrue(row >= 0, "Row must not be negative")
-    Validate.isTrue(column in 0 until 9, "Column must be >= 0 and < 9")
+    Validate.isTrue(column in 0 until ROW_SIZE, "Column must be >= 0 and < $ROW_SIZE")
     return row * ROW_SIZE + column
 }
 
