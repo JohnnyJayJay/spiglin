@@ -53,11 +53,12 @@ object RetrieverRegistry {
         add(PrepareItemEnchantEvent::class) { setOf(it.inventory, it.item) }
         add(PrepareAnvilEvent::class) { setOf(it.inventory, it.result) }
         add(PrepareItemCraftEvent::class) { setOf(it.inventory, it.recipe?.result) }
-        add(InventoryClickEvent::class) { setOf(it.inventory, it.currentItem) }
-        add(InventoryDragEvent::class) { setOf(it.inventory, it.newItems.values) }
+        add(InventoryCloseEvent::class) { setOf(it.inventory, it.player) }
+        add(InventoryClickEvent::class) { setOf(it.inventory, it.currentItem, it.whoClicked) }
+        add(InventoryDragEvent::class) { HashSet(it.newItems.map { it.value } + it.cursor + it.oldCursor + it.inventory) }
         add(InventoryMoveItemEvent::class) { setOf(it.initiator, it.destination, it.item) }
         add(InventoryPickupItemEvent::class) { setOf(it.inventory, it.item.itemStack) }
-        add(BlockDropItemEvent::class) { HashSet(it.items.map { it.itemStack }) + it.player }
+        add(BlockDropItemEvent::class) { HashSet(it.items.map { it.itemStack } + it.player)}
         add(BrewingStandFuelEvent::class) { setOf(it.fuel, it.block) }
         add(FurnaceBurnEvent::class) { setOf(it.fuel, it.block) }
         add(FurnaceSmeltEvent::class) { setOf(it.result, it.source, it.block) }
