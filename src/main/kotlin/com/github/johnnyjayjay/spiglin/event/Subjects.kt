@@ -46,21 +46,21 @@ object RetrieverRegistry {
                 it.player.inventory[it.newSlot]
             )
         }
-        add(EntityPickupItemEvent::class) { setOf(it.item.itemStack) }
-        add(EntityDropItemEvent::class) { setOf(it.itemDrop.itemStack) }
+        add(EntityPickupItemEvent::class) { setOf(it.entity, it.item.itemStack) }
+        add(EntityDropItemEvent::class) { setOf(it.entity, it.itemDrop.itemStack) }
         add(ItemMergeEvent::class) { setOf(it.entity.itemStack) }
-        add(EnchantItemEvent::class) { setOf(it.item) }
-        add(PrepareItemEnchantEvent::class) { setOf(it.item) }
-        add(PrepareAnvilEvent::class) { setOf(it.result) }
-        add(PrepareItemCraftEvent::class) { setOf(it.recipe?.result) }
-        add(InventoryClickEvent::class) { setOf(it.currentItem) }
-        add(InventoryDragEvent::class) { setOf(it.newItems.values) }
-        add(InventoryMoveItemEvent::class) { setOf(it.item) }
-        add(InventoryPickupItemEvent::class) { setOf(it.item.itemStack) }
-        add(BlockDropItemEvent::class) { setOf(it.items.map { it.itemStack }) }
-        add(BrewingStandFuelEvent::class) { setOf(it.fuel) }
-        add(FurnaceBurnEvent::class) { setOf(it.fuel) }
-        add(FurnaceSmeltEvent::class) { setOf(it.result, it.source) }
+        add(EnchantItemEvent::class) { setOf(it.inventory, it.item) }
+        add(PrepareItemEnchantEvent::class) { setOf(it.inventory, it.item) }
+        add(PrepareAnvilEvent::class) { setOf(it.inventory, it.result) }
+        add(PrepareItemCraftEvent::class) { setOf(it.inventory, it.recipe?.result) }
+        add(InventoryClickEvent::class) { setOf(it.inventory, it.currentItem) }
+        add(InventoryDragEvent::class) { setOf(it.inventory, it.newItems.values) }
+        add(InventoryMoveItemEvent::class) { setOf(it.initiator, it.destination, it.item) }
+        add(InventoryPickupItemEvent::class) { setOf(it.inventory, it.item.itemStack) }
+        add(BlockDropItemEvent::class) { HashSet(it.items.map { it.itemStack }) + it.player }
+        add(BrewingStandFuelEvent::class) { setOf(it.fuel, it.block) }
+        add(FurnaceBurnEvent::class) { setOf(it.fuel, it.block) }
+        add(FurnaceSmeltEvent::class) { setOf(it.result, it.source, it.block) }
         add(BlockBreakEvent::class) { setOf(it.block, it.player) }
         add(PlayerInteractEntityEvent::class) { setOf(it.player, it.rightClicked) }
         add(EntityDamageByEntityEvent::class) { setOf(it.damager, it.entity) }
