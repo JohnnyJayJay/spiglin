@@ -3,6 +3,7 @@ package com.github.johnnyjayjay.spiglin
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
+import org.bukkit.entity.Player
 
 /**
  * An implementation of [CommandExecutor] that can have child commands,

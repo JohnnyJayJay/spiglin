@@ -8,6 +8,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockDropItemEvent
 import org.bukkit.event.block.BlockEvent
+import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.enchantment.EnchantItemEvent
 import org.bukkit.event.enchantment.PrepareItemEnchantEvent
 import org.bukkit.event.entity.*
@@ -62,6 +63,7 @@ object RetrieverRegistry {
         add(BrewingStandFuelEvent::class) { setOf(it.fuel, it.block) }
         add(FurnaceBurnEvent::class) { setOf(it.fuel, it.block) }
         add(FurnaceSmeltEvent::class) { setOf(it.result, it.source, it.block) }
+        add(BlockPlaceEvent::class) { setOf(it.block, it.player, it.blockAgainst, it.itemInHand) }
         add(BlockBreakEvent::class) { setOf(it.block, it.player) }
         add(PlayerInteractEntityEvent::class) { setOf(it.player, it.rightClicked) }
         add(EntityDamageByEntityEvent::class) { setOf(it.damager, it.entity) }
