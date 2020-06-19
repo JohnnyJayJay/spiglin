@@ -85,7 +85,7 @@ This will result in an item with this NBT data:
 !["In-Game look"](https://i.imgur.com/GpSey2k.png)
 
 ##### Version Considerations
-Since NBT requires dependencies on `net.minecraft.server` and `org.bukkit.craftbukkit`, code that uses them is 
+Since NBT tags require dependencies on `net.minecraft.server` and `org.bukkit.craftbukkit`, code that uses them is 
 not version independent - *spiglin* is no exception for that matter.
 
 Internally and thus far, it uses spigot 1.14.4, but you should **not** rely on this.
