@@ -1,12 +1,12 @@
 # Spiglin
-Spiglin is a collection of [Kotlin](https://kotlinlang.org/) extensions and utilities 
+*Spiglin* is a collection of [Kotlin](https://kotlinlang.org/) extensions and utilities 
 for the Minecraft server software [Spigot/Bukkit](https://www.spigotmc.org/).
 
 ## Dependency
 https://bintray.com/johnnyjayjay/spiglin/spiglin
 
 ## Features
-Spiglin provides several different components that improve certain parts of interacting 
+*Spiglin* provides several different components that improve certain parts of interacting 
 with Bukkit's API, including two very small EDSLs (Embedded Domain Specific Language).
 
 The following components of the Bukkit API are covered and extended by this collection:
@@ -46,6 +46,55 @@ is just a wrapper of what is possible anyway. If a certain feature does not exis
 I highly discourage you from using it. You will most likely get runtime errors.
 
 If you are uncertain, check out the documentation for the individual methods and variables.
+
+#### NBT Tags
+*Spiglin* has utilities to create and manage NBT tags/data.
+```kotlin
+val nbtData = item.nbt // get a copy of an ItemStack's NBTTagCompound
+```
+Here's an example of creating a skull with a custom texture:
+```kotlin
+val head = ItemStack(Material.PLAYER_HEAD).withNbt(nbtCompound {
+        this["SkullOwner"] = nbtCompound {
+            // any uuid that does not belong to a player will do
+            this["Id"] = "c8b28030-905d-4d85-a881-372849a8adc8".nbt() 
+            this["Properties"] = nbtCompound {
+                this["textures"] = nbtList(nbtCompound {
+                    // Base64 texture value found at https://minecraft-heads.com/custom-heads/decoration/37573-computer
+                    this["Value"] = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmQ5ZjE4YzlkODVmOTJmNzJmODY0ZDY3YzEzNjdlOWE0NWRjMTBmMzcxNTQ5YzQ2YTRkNGRkOWU0ZjEzZmY0In19fQ==".nbt()
+                })
+            }
+        }
+    })
+```
+This will result in an item with this NBT data:
+```
+{
+  SkullOwner: {
+    Id: "c8b28030-905d-4d85-a881-372849a8adc8",
+    Properties: {
+      textures: [
+        {
+          Value: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmQ5ZjE4YzlkODVmOTJmNzJmODY0ZDY3YzEzNjdlOWE0NWRjMTBmMzcxNTQ5YzQ2YTRkNGRkOWU0ZjEzZmY0In19fQ=="       
+        }   
+      ]
+    }   
+  }
+}
+```
+!["In-Game look"](https://i.imgur.com/GpSey2k.png)
+
+##### Version Considerations
+Since NBT requires dependencies on `net.minecraft.server` and `org.bukkit.craftbukkit`, code that uses them is 
+not version independent - *spiglin* is no exception for that matter.
+
+Internally and thus far, it uses spigot 1.14.4, but you should **not** rely on this.
+Instead, you have two options to make it work across different versions:
+- Don't use the NBT extensions at all *or*
+- Use [*compatre*](https://github.com/johnnyjayjay/compatre). *Spiglin* declares a `compileOnly` 
+dependency on this tool and annotates the nms code as `NmsDependent`, which allows it to replace the nms and 
+craftbukkit types with the correct ones at runtime. The overhead of this is practically non-existent and you 
+have to add a few lines of code at most.
 
 ### Inventories
 (Chest) Inventory creation:
