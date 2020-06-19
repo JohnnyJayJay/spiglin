@@ -13,6 +13,9 @@ fun ItemStack.withNbt(compound: NBTTagCompound?): ItemStack =
         CraftItemStack.asBukkitCopy(it)
     }
 
+val ItemStack.nbt
+    get() = CraftItemStack.asNMSCopy(this).tag
+
 inline fun nbtCompound(body: NBTTagCompound.() -> Unit) = NBTTagCompound().apply(body)
 
 fun nbtList(vararg elements: NBTBase) = NBTTagList().apply { addAll(elements) }
