@@ -15,11 +15,12 @@ repositories {
     maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
     maven { url "https://jitpack.io" }
     mavenCentral()
+    mavenLocal()
 }
 
 dependencies {
     api "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-    compileOnly "org.spigotmc:spigot-api:1.14.4-R0.1-SNAPSHOT"
+    compileOnly "org.spigotmc:spigot:1.14.4-R0.1-SNAPSHOT"
     compileOnly "com.github.johnnyjayjay:compatre:master-SNAPSHOT"
 }
 
