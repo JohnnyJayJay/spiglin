@@ -1,17 +1,21 @@
 # Spiglin
+
 *Spiglin* is a collection of [Kotlin](https://kotlinlang.org/) extensions and utilities 
 for the Minecraft server software [Spigot/Bukkit](https://www.spigotmc.org/).
 
 ## Dependency
+
 https://bintray.com/johnnyjayjay/spiglin/spiglin
 
 ## Features
+
 *Spiglin* provides several different components that improve certain parts of interacting 
 with Bukkit's API, including two very small EDSLs (Embedded Domain Specific Language).
 
 The following components of the Bukkit API are covered and extended by this collection:
 
 - Items
+- NBT tags
 - Inventories
 - Commands
 - Listeners
@@ -20,8 +24,10 @@ The following components of the Bukkit API are covered and extended by this coll
 - Vector & Location
 
 ### Items
+
 This EDSL makes the creation of custom items very simple and concise. 
 Most of it is self-explanatory:
+
 ```kotlin
 val item: ItemStack = item(Material.GRASS_BLOCK) {
     amount = maxStackSize // default is 1
@@ -39,6 +45,7 @@ val item: ItemStack = item(Material.GRASS_BLOCK) {
     }   
 }
 ```
+
 `ItemMeta`s can also be built without an item attached. See `<T> itemMeta(Material, T.() -> Unit)`.
 
 Note that some things (like `attributes`) are exclusive to certain Spigot versions. Just remember that this EDSL 
@@ -48,11 +55,15 @@ I highly discourage you from using it. You will most likely get runtime errors.
 If you are uncertain, check out the documentation for the individual methods and variables.
 
 #### NBT Tags
+
 *Spiglin* has utilities to create and manage NBT tags/data.
+
 ```kotlin
 val nbtData = item.nbt // get a copy of an ItemStack's NBTTagCompound
 ```
+
 Here's an example of creating a skull with a custom texture:
+
 ```kotlin
 val head = ItemStack(Material.PLAYER_HEAD).withNbt(nbtCompound {
         this["SkullOwner"] = nbtCompound {
@@ -67,7 +78,9 @@ val head = ItemStack(Material.PLAYER_HEAD).withNbt(nbtCompound {
         }
     })
 ```
+
 This will result in an item with this NBT data:
+
 ```
 {
   SkullOwner: {
@@ -82,22 +95,30 @@ This will result in an item with this NBT data:
   }
 }
 ```
+
 !["In-Game look"](https://i.imgur.com/GpSey2k.png)
 
 ##### Version Considerations
+
 Since NBT tags require dependencies on `net.minecraft.server` and `org.bukkit.craftbukkit`, code that uses them is 
 not version independent - *spiglin* is no exception for that matter.
 
 Internally and thus far, it uses spigot 1.14.4, but you should **not** rely on this.
 Instead, you have two options to make it work across different versions:
+
 - Don't use the NBT extensions at all *or*
 - Use [*compatre*](https://github.com/johnnyjayjay/compatre). *Spiglin* declares a `compileOnly` 
-dependency on this tool and annotates the nms code as `NmsDependent`, which allows it to replace the nms and 
-craftbukkit types with the correct ones at runtime. The overhead of this is practically non-existent and you 
-have to add a few lines of code at most.
+
+  dependency on this tool and annotates the nms code as `NmsDependent`, which allows it to replace the nms and 
+
+  craftbukkit types with the correct ones at runtime. The overhead of this is practically non-existent and you 
+
+  have to add a few lines of code at most.
 
 ### Inventories
+
 (Chest) Inventory creation:
+
 ```kotlin
 val inventory: Inventory = inventory(rows = 3, title = "Click the button") {
     // you can assign the contents directly or use the get/set operators
@@ -107,6 +128,7 @@ val inventory: Inventory = inventory(rows = 3, title = "Click the button") {
 ```
 
 There are several other utility functions:
+
 ```kotlin
 with (inventory) {
     val itemsInFirstRow = this[row(0)]
@@ -119,6 +141,7 @@ with (inventory) {
     val itemInFirstSlot = inventory[slot(0, 0)]
 }
 ```
+
 Of course, there are also operator overloads for setting items this way.
 
 The inventory `get()/set()` operators are very flexible because they either generally 
@@ -128,15 +151,18 @@ that are used to access `inventory.contents`.
 In these examples, utility functions like `slot(Int, Int)` were used to convert two 
 dimensional indices (row - column) to linear ones. You may of course directly use 
 linear indices, like so:
+
 ```kotlin
 val item: ItemStack? = inventory[23]
 ```
 
 ### Commands
+
 Spiglin provides an implementation of `CommandExecutor` in its main package, `DelegatingCommand`, 
 which can be used to create tree-like command structures. 
 
 For example, take a warn system with the following commands:
+
 - warn list <Player>; lists all warns a player has received
 - warn add <Player> <Reason>; warns a player for some reason
 - warn remove <Player> <ID>; Removes a warn with a specific ID from the player
@@ -165,13 +191,16 @@ When an instance of `DelegatingCommand` delegates to a child,
 the previously first argument is dropped and the label is changed to the child label.
 
 ### Listeners
+
 Spiglin introduces 3 new and convenient ways to listen for events.
 
 #### Ad hoc listeners
+
 This allows you to listen to listen for events via generics and without making a 
 listener class and method yourself.
 
 Here's a simple listener that logs messages written to chat:
+
 ```kotlin
 plugin.hear<AsyncPlayerChatEvent> {
     logger.log("Player ${it.player.name} sent a message in chat: ${it.message}")
@@ -179,10 +208,12 @@ plugin.hear<AsyncPlayerChatEvent> {
 ```
 
 #### Expectations
+
 Expectations allow you to "wait" for specific events that meet specific conditions.
 They unregister themselves once the expectation is met or timed out.
 
 Here's a piece of code that teleports a player to a location, provided that they don't move:
+
 ```kotlin
 plugin.expect<PlayerMoveEvent>(
     predicate = { it.player == player },
@@ -194,6 +225,7 @@ plugin.expect<PlayerMoveEvent>(
 ```
 
 #### Subject specific listeners
+
 With spiglin, several different types of object are considered to be "event subjects":
 
 - `Block`
@@ -207,21 +239,25 @@ You can attach subject specific listeners to instances of these types that will 
 called if the event involves this instance.
 
 For instance, take a look at this:
+
 ```kotlin
 block.on<BlockBreakEvent> {
     it.player.sendMessage("You broke it :'(")
 }
 ```
+
 The code within the {} will only be called if this specific block is broken.
 
 **Note that spiglin's list of subject related events is not guaranteed to be complete and does not
  derive from any Bukkit API,  i.e. some events may not work as expected.**
- 
+
  **Feel free to expand the list of supported events for this feature. by submitting a Pull Request.**
 
 ### Schedulers
+
 In the `scheduler` package, you can find convenient wrappers and extensions for the 
 scheduler actions available in Bukkit.
+
 ```kotlin
 // .runTask
 plugin.run { } 
@@ -232,13 +268,15 @@ plugin.schedule(delay = 20, period = 20 * 5) {}
 
 // repeat from the beginning to the end of the provided progression
 plugin.repeat(progression = 1..5, delay = 20, period = 20 * 5) { current ->
-    
+
 }
 ```
+
 All of these functions also have an `async` parameter that can be used to 
 run them asynchronously.
 
 ### Player
+
 ```kotlin
 player.kill() // Applicable to any other Damageable
 player.heal() // ""
@@ -250,6 +288,7 @@ player.play(effect = Effect.ANVIL_BREAK) // various utility functions with defau
 ```
 
 ### General
+
 ```kotlin
 val players: Collection<Player> = onlinePlayers // shortcut for Bukkit.getOnlinePlayers()
 broadcast("Hello, Minecraft!") // shortcut for Bukkit.broadcastMessage(String)
@@ -258,7 +297,9 @@ Server.shutdown() // shortcut for Bukkit.getServer()
 ```
 
 ### Vector & Location
+
 This mainly adds operator overloading to these components.
+
 ```kotlin
 val euclideanNorm = vector.abs
 val negated = -vector // respectively: +vector
