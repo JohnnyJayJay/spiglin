@@ -118,6 +118,9 @@ Instead, you have two options to make it work across different versions:
   craftbukkit types with the correct ones at runtime. The overhead of this is practically non-existent and you 
 
   have to add a few lines of code at most.
+  
+Note that besides the *Spigot* version you use, you need to declare a `compileOnly` 
+dependency on the *Spigot* version *Spiglin* uses as well in order to make this work.
 
 ### Inventories
 
