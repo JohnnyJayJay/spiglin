@@ -8,28 +8,20 @@ import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftItemStack
 import org.bukkit.inventory.ItemStack
 import java.lang.invoke.MethodHandles
 
-/**
- * Returns a copy of this ItemStack with the given NBTTagCompound as its nbt data.
- */
-fun ItemStack.withNbt(compound: NBTTagCompound?): ItemStack =
-    CraftItemStack.asNMSCopy(this).let {
-        it.tag = compound
-        CraftItemStack.asBukkitCopy(it)
-    }
+private val handleField =
+    CraftItemStack::class.java.getDeclaredField("handle").also { it.isAccessible = true }
 
-private val nbtGetter = MethodHandles.lookup()
-    .findGetter(CraftItemStack::class.java, "handle", net.minecraft.server.v1_14_R1.ItemStack::class.java)
+private val handleGetter = MethodHandles.lookup().unreflectGetter(handleField)
 
-private val nbtSetter = MethodHandles.lookup()
-    .findSetter(CraftItemStack::class.java, "handle", net.minecraft.server.v1_14_R1.ItemStack::class.java)
+private val handleSetter = MethodHandles.lookup().unreflectSetter(handleField)
 
 /**
- * This ItemStack's nbt data.
+ * The handle (nms ItemStack) of this bukkit ItemStack.
  */
-var ItemStack.nbt
-    get() = nbtGetter.invoke(this) as NBTTagCompound?
+var ItemStack.nms: net.minecraft.server.v1_14_R1.ItemStack
+    get() = handleGetter.invoke(this) as net.minecraft.server.v1_14_R1.ItemStack
     set(value) {
-        nbtSetter.invoke(this, value)
+        handleSetter.invoke(this, value)
     }
 
 /**
