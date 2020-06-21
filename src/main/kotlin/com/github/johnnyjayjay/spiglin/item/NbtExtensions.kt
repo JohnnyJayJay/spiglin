@@ -6,6 +6,7 @@ import com.github.johnnyjayjay.compatre.NmsDependent
 import net.minecraft.server.v1_14_R1.*
 import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftItemStack
 import org.bukkit.inventory.ItemStack
+import java.lang.invoke.MethodHandles
 
 /**
  * Returns a copy of this ItemStack with the given NBTTagCompound as its nbt data.
@@ -16,12 +17,20 @@ fun ItemStack.withNbt(compound: NBTTagCompound?): ItemStack =
         CraftItemStack.asBukkitCopy(it)
     }
 
-/**
- * Returns a copy this ItemStack's nbt data or null if there is none.
- */
-val ItemStack.nbt
-    get() = CraftItemStack.asNMSCopy(this).tag
+private val nbtGetter = MethodHandles.lookup()
+    .findGetter(CraftItemStack::class.java, "handle", net.minecraft.server.v1_14_R1.ItemStack::class.java)
 
+private val nbtSetter = MethodHandles.lookup()
+    .findSetter(CraftItemStack::class.java, "handle", net.minecraft.server.v1_14_R1.ItemStack::class.java)
+
+/**
+ * This ItemStack's nbt data.
+ */
+var ItemStack.nbt
+    get() = nbtGetter.invoke(this) as NBTTagCompound?
+    set(value) {
+        nbtSetter.invoke(this, value)
+    }
 
 /**
  * Creates a new NBTTagCompound, applies the given body and returns it.

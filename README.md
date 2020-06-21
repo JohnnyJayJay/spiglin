@@ -34,7 +34,7 @@ val item: ItemStack = item(Material.GRASS_BLOCK) {
     enchant(unsafe = true) {
         with(Enchantment.FIRE_ASPECT) level 3 // adds fire aspect 3 as an enchantment
     }
-    meta { // meta {} also has a type parameter that lets you work with more specific ItemMetas.
+    meta<ItemMeta> { // meta {} has a type parameter that lets you work with more specific ItemMetas.
         name = "Grass block of doom"
         stringLore = "A very\npowerful weapon" // instead of Lists, normal Strings can be used with stringLore. This just delegates to the normal lore.
         unbreakable = true
@@ -59,24 +59,28 @@ If you are uncertain, check out the documentation for the individual methods and
 *Spiglin* has utilities to create and manage NBT tags/data.
 
 ```kotlin
-val nbtData = item.nbt // get a copy of an ItemStack's NBTTagCompound
+val nbtData: NBTTagCompound? = item.nbt // get this ItemStack's NBTTagCompound
 ```
 
 Here's an example of creating a skull with a custom texture:
 
 ```kotlin
-val head = ItemStack(Material.PLAYER_HEAD).withNbt(nbtCompound {
+val head = item(Material.PLAYER_HEAD) {
+    itemMeta.name = "Computer"
+    nbt = nbtCompound {
         this["SkullOwner"] = nbtCompound {
             // any uuid that does not belong to a player will do
-            this["Id"] = "c8b28030-905d-4d85-a881-372849a8adc8".nbt() 
+            this["Id"] = "c8b28030-905d-4d85-a881-372849a8adc8".nbt()
             this["Properties"] = nbtCompound {
                 this["textures"] = nbtList(nbtCompound {
                     // Base64 texture value found at https://minecraft-heads.com/custom-heads/decoration/37573-computer
-                    this["Value"] = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmQ5ZjE4YzlkODVmOTJmNzJmODY0ZDY3YzEzNjdlOWE0NWRjMTBmMzcxNTQ5YzQ2YTRkNGRkOWU0ZjEzZmY0In19fQ==".nbt()
+                    this["Value"] =
+                        "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmQ5ZjE4YzlkODVmOTJmNzJmODY0ZDY3YzEzNjdlOWE0NWRjMTBmMzcxNTQ5YzQ2YTRkNGRkOWU0ZjEzZmY0In19fQ==".nbt()
                 })
             }
         }
-    })
+    }
+}
 ```
 
 This will result in an item with this NBT data:
