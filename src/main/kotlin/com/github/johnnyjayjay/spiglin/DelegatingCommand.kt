@@ -13,7 +13,7 @@ import org.bukkit.entity.Player
  *                  The default implementation for this parameter just returns false.
  * @param children  A Map of command label -> CommandExecutor representing the direct children of this command.
  */
-class DelegatingCommand(
+open class DelegatingCommand(
     private val default: CommandExecutor = invalidCommand,
     private val children: Map<String, CommandExecutor>
 ) : CommandExecutor {
