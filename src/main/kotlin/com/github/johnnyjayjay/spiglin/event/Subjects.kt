@@ -59,7 +59,7 @@ object RetrieverRegistry {
         add(InventoryDragEvent::class) { HashSet(it.newItems.map { it.value } + it.cursor + it.oldCursor + it.inventory) }
         add(InventoryMoveItemEvent::class) { setOf(it.initiator, it.destination, it.item) }
         add(InventoryPickupItemEvent::class) { setOf(it.inventory, it.item.itemStack) }
-        add(BlockDropItemEvent::class) { HashSet(it.items.map { it.itemStack } + it.player)}
+        add(BlockDropItemEvent::class) { HashSet(it.items.map { it.itemStack } + it.player) }
         add(BrewingStandFuelEvent::class) { setOf(it.fuel, it.block) }
         add(FurnaceBurnEvent::class) { setOf(it.fuel, it.block) }
         add(FurnaceSmeltEvent::class) { setOf(it.result, it.source, it.block) }
@@ -122,8 +122,10 @@ inline fun <reified T : Event> Any.on(
     crossinline action: Listener.(T) -> Unit
 ): ExtendedListener<T> {
     val retriever = RetrieverRegistry.find(T::class)
-    Validate.isTrue(retriever != null,
-        "Event " + T::class + " is not available")
+    Validate.isTrue(
+        retriever != null,
+        "Event " + T::class + " is not available"
+    )
     return plugin.hear(priority, ignoreCancelled) {
         if (this@on in retriever!!(it)) {
             action(it)

@@ -19,6 +19,17 @@ repositories {
 dependencies {
     api "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     compileOnly "org.spigotmc:spigot-api:1.14.4-R0.1-SNAPSHOT"
+
+    // Tests
+    testImplementation "org.spigotmc:spigot-api:1.14.4-R0.1-SNAPSHOT" // Tests do not have spigot classes in classpath since they're not being executed within a spigot server
+    testImplementation "org.mockito:mockito-core:3.3.3"
+    testImplementation "org.junit.jupiter:junit-jupiter-api:5.6.0"
+    testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5:1.3.72'
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.6.0"
+}
+
+test {
+    useJUnitPlatform()
 }
 
 compileTestKotlin {
@@ -86,10 +97,10 @@ publishing {
             version version.toString()
             pom.withXml {
                 def root = asNode()
-                root.appendNode("name", "spiglin")
+                root.appendNode("name:spiglin")
                 root.appendNode("description",
                         "A collection of Kotlin extensions and utilities for the Spigot/Bukkit framework.")
-                root.appendNode("url", "https://github.com/johnnyjayjay/spiglin/")
+                root.appendNode("url:https://github.com/johnnyjayjay/spiglin/")
                 root.children().last() + pomConfig
             }
         }

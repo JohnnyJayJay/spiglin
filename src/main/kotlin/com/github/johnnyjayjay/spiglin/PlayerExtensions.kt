@@ -86,7 +86,7 @@ fun Player.play(
  * @see Player.playNote
  */
 fun Player.play(location: Location = this.location, instrument: Instrument, note: Note) =
-    playNote(location,  instrument, note)
+    playNote(location, instrument, note)
 
 
 

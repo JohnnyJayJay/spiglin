@@ -25,7 +25,7 @@ operator fun Vector.times(scalar: Number) =
     clone().multiply(scalar.toDouble())
 
 /** Multiplies this vector with the given scalar. */
-operator fun Vector.timesAssign(scalar: Number){
+operator fun Vector.timesAssign(scalar: Number) {
     multiply(scalar.toDouble())
 }
 
