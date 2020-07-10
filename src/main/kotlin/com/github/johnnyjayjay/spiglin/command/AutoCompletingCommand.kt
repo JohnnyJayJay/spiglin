@@ -40,13 +40,17 @@ class AutoCompletingCommand(default: CommandExecutor = invalidCommand, children:
             ) ?: mutableListOf()
         }
 
-        return invoke?.let { notNullInvoke ->
+        val commandSuggestions = (default as? TabExecutor)?.onTabComplete(sender, command, alias, args) ?: emptyList()
+
+        val subCommands = invoke?.let { notNullInvoke ->
             children.filterKeys {
                 it.startsWith(
                     notNullInvoke,
                     ignoreCase = true
                 )
-            }.keys.toMutableList()
-        } ?: children.keys.toMutableList()
+            }.keys
+        } ?: children.keys
+
+        return (commandSuggestions + subCommands).toMutableList()
     }
 }

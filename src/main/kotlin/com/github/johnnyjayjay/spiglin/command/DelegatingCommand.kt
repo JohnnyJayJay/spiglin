@@ -13,7 +13,7 @@ import org.bukkit.command.CommandSender
  * @param children  A Map of command label -> CommandExecutor representing the direct children of this command.
  */
 open class DelegatingCommand(
-    private val default: CommandExecutor = invalidCommand,
+    protected val default: CommandExecutor = invalidCommand,
     protected val children: Map<String, CommandExecutor>
 ) : CommandExecutor {
 
