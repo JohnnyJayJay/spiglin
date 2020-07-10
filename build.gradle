@@ -97,7 +97,8 @@ publishing {
             version version.toString()
             pom.withXml {
                 def root = asNode()
-                root.appendNode("name", "spiglin")
+                root.appendNode("name", "" +
+                        "spiglin")
                 root.appendNode("description",
                         "A collection of Kotlin extensions and utilities for the Spigot/Bukkit framework.")
                 root.appendNode("url", "https://github.com/johnnyjayjay/spiglin/")

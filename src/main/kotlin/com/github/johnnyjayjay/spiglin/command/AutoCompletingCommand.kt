@@ -32,7 +32,7 @@ class AutoCompletingCommand(default: CommandExecutor = invalidCommand, children:
                     invoke,
                     ignoreCase = true
                 )
-            }.values.firstOrNull() as? AutoCompletingCommand)?.onTabComplete(
+            }.values.firstOrNull() as? TabExecutor)?.onTabComplete(
                 sender,
                 command,
                 alias,
