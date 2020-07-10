@@ -13,7 +13,7 @@ import org.bukkit.plugin.java.JavaPlugin
  */
 fun JavaPlugin.command(name: String, convention: CommandConvention.() -> Unit) {
     val command = getCommand(name)
-    requireNotNull(command) { "Command is null, did you forget to register it in your plugin.yml" }
+    requireNotNull(command) { "Command is null, did you forget to register it in your plugin.yml?" }
     command.setExecutor(command(convention))
 }
 
@@ -35,7 +35,7 @@ class CommandConvention internal constructor() {
     /**
      * Applies the [executor] as the root command at the current level.
      */
-    fun rootCommand(executor: CommandContext.() -> Boolean) {
+    fun rootCommand(executor: (CommandContext) -> Boolean) {
         root = commandExecutor(executor)
     }
 
@@ -44,7 +44,7 @@ class CommandConvention internal constructor() {
      *
      * @see subCommand
      */
-    fun subCommandExecutor(name: String, executor: CommandContext.() -> Boolean): Unit = subCommand(name) {
+    fun subCommandExecutor(name: String, executor: (CommandContext) -> Boolean): Unit = subCommand(name) {
         rootCommand(executor)
     }
 
@@ -55,7 +55,7 @@ class CommandConvention internal constructor() {
         children[name] = CommandConvention().apply(command).build()
     }
 
-    private fun commandExecutor(executor: CommandContext.() -> Boolean) =
+    private fun commandExecutor(executor: (CommandContext) -> Boolean) =
         CommandExecutor { sender, command, label, args -> CommandContext(sender, command, label, args).run(executor) }
 
     internal fun build(): CommandExecutor = AutoCompletingCommand(root, children)

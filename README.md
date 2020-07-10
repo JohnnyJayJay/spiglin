@@ -122,45 +122,40 @@ In addition to `DelegatingCommand` and `AutoCompletingCommand` there also is an 
 
 The `command` method returns an instance of an `CommandExecutor` that can be registered in the same way as an `DelegatingCommand` or `AutoCompletingCommand`
 
-Each individual command is defined as a [lambda with a receiver](https://kotlinlang.org/docs/reference/lambdas.html#function-literals-with-receiver) taking an instance of the `CommandContext class` which has the properties as the parameters of `CommandExecutor#onCommand()`
+Each individual command is defined as a [lambda](https://kotlinlang.org/docs/reference/lambdas.html) taking an instance of the `CommandContext class` which has the properties as the parameters of `CommandExecutor#onCommand()`
 
 ```kotlin
 command {
-    // /command
-    rootCommand { 
+    rootCommand {
+        it.sender // You can access the player from the command context 
         println("HI")
         true // return
     }
 
-    // /command sub1
-    subCommandExecutor("sub1") {
+    subCommandExecutor("sub1") { (sender, command, label, args) -> // or you can use destructuring
         println("sub1")
         true // return
     }
 
-    // Configuration for /command sub2 [args...]
-    subCommand("sub2") {
-        // /command sub2 sub3
+    subCommand("sub2sub") {
         rootCommand {
             println("sub3")
             true // return
         }
-    
-        // /command sub2 sub4
-        subCommandExecutor("sub4") {
-            println("sub4")
+
+        subCommandExecutor("sub3") {
+            println("sub3")
             true // return
         }
 
-        // /command sub2 sub5
-        subCommandExecutor("sub5") {
-            println("sub5")
+        subCommandExecutor("sub4sub") {
+            println("sub3")
             true // return
         }
     }
 }
-```
 
+```
 There also is an Extension of `JavaPlugin` which does already register the command for you (not in plugin.yml)
 
 ```kotlin
