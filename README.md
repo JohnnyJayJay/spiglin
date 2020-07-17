@@ -11,13 +11,13 @@ with Bukkit's API, including two very small EDSLs (Embedded Domain Specific Lang
 
 The following components of the Bukkit API are covered and extended by this collection:
 
-- Items
-- Inventories
-- Commands
-- Listeners
-- Scheduler
-- Player
-- Vector & Location
+- [Items](#items)
+- [Inventories](#inventories)
+- [Commands](#commands)
+- [Listeners](#listeners)
+- [Scheduler](#schedulers)
+- [Player](#player)
+- [Vector & Location](#vector--location)
 
 ### Items
 This EDSL makes the creation of custom items very simple and concise. 
@@ -114,6 +114,55 @@ The children themselves can also be `DelegatingCommand`s of course.
 
 When an instance of `DelegatingCommand` delegates to a child, 
 the previously first argument is dropped and the label is changed to the child label.
+
+There also is an Extension of `DelegatingCommand` called `AutoCompletingCommand` which provides tab-complete suggestions for its children, the usage is the same as for `DelegatingCommand`
+
+### Command DSL
+In addition to `DelegatingCommand` and `AutoCompletingCommand` there also is an EDSL providing an easier way to create more complex command structures.
+
+The `command` method returns an instance of an `CommandExecutor` that can be registered in the same way as an `DelegatingCommand` or `AutoCompletingCommand`
+
+Each individual command is defined as a [lambda](https://kotlinlang.org/docs/reference/lambdas.html) taking an instance of the `CommandContext class` which has the properties as the parameters of `CommandExecutor#onCommand()`
+
+```kotlin
+command {
+    rootCommand {
+        it.sender // You can access the player from the command context 
+        println("HI")
+        true // return
+    }
+
+    subCommandExecutor("sub1") { (sender, command, label, args) -> // or you can use destructuring
+        println("sub1")
+        true // return
+    }
+
+    subCommand("sub2sub") {
+        rootCommand {
+            println("sub3")
+            true // return
+        }
+
+        subCommandExecutor("sub3") {
+            println("sub3")
+            true // return
+        }
+
+        subCommandExecutor("sub4sub") {
+            println("sub3")
+            true // return
+        }
+    }
+}
+
+```
+There also is an Extension of `JavaPlugin` which does already register the command for you (not in plugin.yml)
+
+```kotlin
+javaPluginInstance.command("test") { // sets an executor for /test
+    // command declaration like in example above
+}
+```
 
 ### Listeners
 Spiglin introduces 3 new and convenient ways to listen for events.
@@ -219,3 +268,10 @@ val subtracted = vector - otherVector
 val dotProduct = vector * otherVector
 val crossProduct = vector x otherVector
 ```
+
+### Configuration
+There is one extension to the `ConfigurationSection` allowing you to load instances of `ConfigurationSerializable` more easily using reification
+
+```kotlin
+val location = config.getSerializable<Location>("<path>")
+``` 

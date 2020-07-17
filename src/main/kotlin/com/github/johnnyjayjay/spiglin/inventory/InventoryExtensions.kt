@@ -60,7 +60,7 @@ fun items(formatString: String, bindings: Map<Char, ItemStack?>): Array<ItemStac
     return rows.asSequence()
         .map { it.toCharArray() }
         .map { it.map(bindings::get) }
-        .reduce { one, two -> one + two}
+        .reduce { one, two -> one + two }
         .toTypedArray()
 }
 
